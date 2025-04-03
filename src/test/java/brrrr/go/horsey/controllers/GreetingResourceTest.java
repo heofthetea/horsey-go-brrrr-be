@@ -1,4 +1,4 @@
-package dhbw.heofthetea;
+package brrrr.go.horsey.controllers;
 
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;

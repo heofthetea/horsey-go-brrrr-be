@@ -1,4 +1,4 @@
-package dhbw.heofthetea;
+package brrrr.go.horsey.controllers;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
