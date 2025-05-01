@@ -1,5 +1,10 @@
 
 quarkus:
+  devservices:
+    enabled: false
+
+
+
   datasource:
     db-kind: postgresql
     db-version: 17.4
@@ -7,7 +12,6 @@ quarkus:
     password: postgres
     jdbc:
       url: jdbc:postgresql://localhost:5432/horsey_go_brrrr
-    devservices: false # why quarkus WHY DO YOU ALWAYS THINK I WANT *YOU* TO START MY CONTAINERS
 
   hibernate-orm:
     database:

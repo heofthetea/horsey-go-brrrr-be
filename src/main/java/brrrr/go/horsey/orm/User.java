@@ -1,11 +1,8 @@
 package brrrr.go.horsey.orm;
 
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -14,8 +11,13 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+    @Column
     private String username;
+
+    @Column
     private String password;
+
+    @Column
     private String email;
 
     public UUID getId() {
@@ -50,3 +52,4 @@ public class User {
         this.username = username;
     }
 }
+
