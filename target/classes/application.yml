@@ -1,0 +1,25 @@
+
+quarkus:
+  devservices:
+    enabled: false
+
+
+
+  datasource:
+    db-kind: postgresql
+    db-version: 17.4
+    username: postgres
+    password: postgres
+    jdbc:
+      url: jdbc:postgresql://localhost:5432/horsey_go_brrrr
+
+  hibernate-orm:
+    database:
+      generation: drop-and-create
+
+
+"%prod":
+  quarkus:
+    datasource:
+      jdbc:
+        url: jdbc:postgresql://postgres:5432/horsey_go_brrrr
