@@ -1,5 +1,6 @@
 package brrrr.go.horsey.orm;
 
+
 import jakarta.persistence.*;
 
 import java.util.Set;
@@ -11,14 +12,20 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    @Column
+    @Column(nullable = false)
     private String username;
 
-    @Column
+    @Column(nullable = false)
     private String password;
 
-    @Column
+    @Column(nullable = false, unique = true)
     private String email;
+
+    public User(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
 
     public UUID getId() {
         return id;
