@@ -2,6 +2,9 @@
 quarkus:
   devservices:
     enabled: false
+  http:
+    port: 8080
+    root-path: /api
 
   datasource:
     db-kind: postgresql
@@ -9,11 +12,12 @@ quarkus:
     username: postgres
     password: postgres
     jdbc:
-      url: jdbc:postgresql://localhost:5432/horsey_go_brrrr
+      url: jdbc:postgresql://localhost:5432/horsey_go_brrrr?createDatabaseIfNotExist=true
 
   hibernate-orm:
     database:
       generation: drop-and-create
+
 
 
 "%prod":
