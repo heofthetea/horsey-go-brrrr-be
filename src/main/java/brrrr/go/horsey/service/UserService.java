@@ -9,6 +9,8 @@ import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 
+import java.util.UUID;
+
 @ApplicationScoped
 public class UserService {
 
@@ -23,7 +25,7 @@ public class UserService {
 
     public User getUser(String id) throws NotFoundException {
         try {
-            return em.find(User.class, id);
+            return em.find(User.class, UUID.fromString(id));
         } catch (NoResultException e) {
             throw new NotFoundException();
         }
