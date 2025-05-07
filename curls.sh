@@ -14,24 +14,12 @@ register_user(){
 
 get_user(){
   query_param=""
-  case $1 in
-    "username")
-      query_param="username=$2"
-      ;;
-    "id")
-      query_param="id=$2"
-      ;;
-    *)
-      echo "Invalid parameter. Use 'username', 'email', or 'id'." && return 1
-      ;;
-  esac
-  curl --silent "$url/users?$query_param"
+  curl --silent "$url/users/$1"
 }
 
 
 create_game() {
-  user_id=$(get_user "username" "$1" | jq -r '.id')
-  json="{\"host\": {\"id\": \"$user_id\"},
+  json="{\"host\": {\"username\": \"$1\"},
              \"width\": $2,
              \"height\": $3,
              \"state\": \"NOT_STARTED\"
@@ -43,6 +31,30 @@ create_game() {
 
 
 get_games() {
-  user_id=$(get_user "username" "$1" | jq -r '.id')
-  curl --silent "$url/games?user_id=$user_id"
+  curl --silent "$url/games?user_id=$1"
+}
+
+join_game(){
+  game=$(get_games $1 | jq -r '.[0].id')
+  json="{\"username\": \"$1\"}"
+  curl -vX PUT "$url/games/join/$game" \
+    -H "Content-Type: application/json" \
+    -d "$json"
+}
+
+full_environment() {
+  register_user test1 test 'test1@test.de'
+  create_game test1 5 5
+  join_game test1
+
+}
+
+make_turn() {
+  game=$(get_games $1 | jq -r '.[0].id')
+  json="{\"user\": {\"username\": \"$1\"},
+             \"column\": $2,
+           }"
+  curl -vX PUT "$url/games/move/$game" \
+    -H "Content-Type: application/json" \
+    -d "$json"
 }

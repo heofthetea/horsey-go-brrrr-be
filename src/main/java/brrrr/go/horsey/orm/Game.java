@@ -1,10 +1,5 @@
 package brrrr.go.horsey.orm;
 
-import brrrr.go.horsey.service.UserService;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.annotation.Nullable;
-import jakarta.inject.Inject;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -32,16 +27,20 @@ public class Game {
     Timestamp endTime;
 
     @Column(name = "width", nullable = false)
-    private Short width;
+    private Byte width;
 
     @Column(name = "height", nullable = false)
-    private Short height;
+    private Byte height;
 
     @Column(name = "state", nullable = false)
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'NOT_STARTED'")
     // default here is handled also by the constructor, because leaving it up to the dbms with insertable = false pretty much nuked every bit of logical behaviour JPA had remaining
     private GameState state;
+
+    @Column(name = "to_move", nullable = false, insertable = false)
+    @ColumnDefault("'HOST'") // nah bro I won't make the mistake of enumerating this shit again
+    private String toMove;
 
     @ManyToOne
     @JoinColumn(name = "host", nullable = false)
@@ -51,7 +50,7 @@ public class Game {
     @JoinColumn(name = "guest")
     private User guest;
 
-    public Game(User host, Short width, Short height) {
+    public Game(User host, Byte width, Byte height) {
         this.host = host;
         this.width = width;
         this.height = height;
@@ -100,19 +99,33 @@ public class Game {
         this.guest = guest;
     }
 
-    public Short getWidth() {
+    /**
+     * Adds a guest to the game if the game does not have a guest yet, or the guest is null.
+     * @param guest the guest to add
+     * @return true if the guest was added, false otherwise
+     */
+    public boolean addGuest(User guest) {
+        if (guest == null)
+            return false;
+        if (this.guest != null)
+            return false;
+        this.guest = guest;
+        return true;
+    }
+
+    public Byte getWidth() {
         return width;
     }
 
-    public void setWidth(Short width) {
+    public void setWidth(Byte width) {
         this.width = width;
     }
 
-    public Short getHeight() {
+    public Byte getHeight() {
         return height;
     }
 
-    public void setHeight(Short height) {
+    public void setHeight(Byte height) {
         this.height = height;
     }
 

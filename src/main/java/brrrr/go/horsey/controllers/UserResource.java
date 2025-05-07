@@ -22,16 +22,10 @@ public class UserResource {
     }
 
     @GET
-    @Path("/")
+    @Path("/{username}")
     @Produces(MediaType.APPLICATION_JSON)
     @ResponseStatus(200)
-    public User getUser(@QueryParam("id") String id, @QueryParam("username") String username) {
-        if (id != null) {
-            return userService.getUser(id);
-        }
-        if (username != null) {
-            return userService.getUserByUsername(username);
-        }
-        throw new BadRequestException("Either 'id' or 'email' must be provided.");
+    public User getUser(@PathParam("username") String username) {
+        return userService.getUser(username);
     }
 }
