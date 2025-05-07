@@ -3,10 +3,15 @@ package brrrr.go.horsey.orm;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
-import javax.print.DocFlavor;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+/**
+ * ORM Model for a connect 4 game.
+ * Required Attributes for creation:
+ * - host
+ * - dimensions (width, height)
+ */
 @Entity
 public class Game {
 
@@ -14,28 +19,53 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column
+    @Column(name = "start_time", nullable = false, insertable = false) // trigger default dbms-side
+    @ColumnDefault("now()")
     private Timestamp startTime;
 
-    @Column
-    private Short width;
+    @Column(name = "end_time")
+    Timestamp endTime;
 
-    @Column
-    private Short height;
+    @Column(name = "width", nullable = false)
+    private Byte width;
 
+    @Column(name = "height", nullable = false)
+    private Byte height;
 
-    @Column
+    @Column(name = "state", nullable = false)
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'NOT_STARTED'")
+    // default here is handled also by the constructor, because leaving it up to the dbms with insertable = false pretty much nuked every bit of logical behaviour JPA had remaining
     private GameState state;
 
-    @ManyToOne
-    @JoinColumn(name = "player_1", nullable = false)
-    private User player1;
+    @Column(name = "to_move", nullable = false, insertable = false)
+    @ColumnDefault("'HOST'") // nah bro I won't make the mistake of enumerating this shit again
+    private String toMove;
 
     @ManyToOne
-    @JoinColumn(name = "player_2", nullable = false)
-    private User player2;
+    @JoinColumn(name = "host", nullable = false)
+    private User host;
+
+    @ManyToOne
+    @JoinColumn(name = "guest")
+    private User guest;
+
+    public Game(User host, Byte width, Byte height) {
+        this.host = host;
+        this.width = width;
+        this.height = height;
+        this.state = GameState.NOT_STARTED;
+    }
+
+    // default constructor is required by JPA
+    public Game() {
+        this.host = null;
+        this.guest = null;
+        this.width = 0;
+        this.height = 0;
+        this.startTime = new Timestamp(System.currentTimeMillis());
+        this.state = GameState.NOT_STARTED;
+    }
 
     public UUID getId() {
         return id;
@@ -53,40 +83,77 @@ public class Game {
         this.startTime = startTime;
     }
 
-    public User getPlayer1() {
-        return player1;
+    public User getHost() {
+        return host;
     }
 
-    public void setPlayer1(User player1) {
-        this.player1 = player1;
+    public void setHost(User host) {
+        this.host = host;
     }
 
-    public User getPlayer2() {
-        return player2;
+    public User getGuest() {
+        return guest;
     }
 
-    public void setPlayer2(User player2) {
-        this.player2 = player2;
+    public void setGuest(User guest) {
+        this.guest = guest;
     }
 
-    public Short getWidth() {
+    /**
+     * Adds a guest to the game if the game does not have a guest yet, or the guest is null.
+     * @param guest the guest to add
+     * @return true if the guest was added, false otherwise
+     */
+    public boolean addGuest(User guest) {
+        if (guest == null)
+            return false;
+        if (this.guest != null)
+            return false;
+        this.guest = guest;
+        return true;
+    }
+
+    public Byte getWidth() {
         return width;
     }
-    public void setWidth(Short width) {
+
+    public void setWidth(Byte width) {
         this.width = width;
     }
-    public Short getHeight() {
+
+    public Byte getHeight() {
         return height;
     }
-    public void setHeight(Short height) {
+
+    public void setHeight(Byte height) {
         this.height = height;
+    }
+
+    public Timestamp getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Timestamp endTime) {
+        this.endTime = endTime;
+    }
+
+    public GameState getState() {
+        return state;
+    }
+
+    public void setState(GameState state) {
+        this.state = state;
+    }
+
+    public void setState(String state) {
+        this.state = GameState.valueOf(state);
     }
 
     public enum GameState {
         NOT_STARTED("NOT_STARTED"),
         IN_PROGRESS("IN_PROGRESS"),
-        PLAYER_1_WON("PLAYER_1_WON"),
-        PLAYER_2_WON("PLAYER_2_WON"),
+        PLAYER_1_WON("HOST_WON"),
+        PLAYER_2_WON("GUEST_WON"),
         DRAW("DRAW");
 
         final String value;

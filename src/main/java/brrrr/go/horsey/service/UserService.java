@@ -9,6 +9,8 @@ import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 
+import java.util.UUID;
+
 @ApplicationScoped
 public class UserService {
 
@@ -21,19 +23,9 @@ public class UserService {
         return user;
     }
 
-    public User getUser(String id) throws NotFoundException {
+    public User getUser(String username) throws NotFoundException {
         try {
-            return em.find(User.class, id);
-        } catch (NoResultException e) {
-            throw new NotFoundException();
-        }
-    }
-
-    public User getUserByUsername(String username) throws NotFoundException {
-        try {
-            return em.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class)
-                    .setParameter("username", username)
-                    .getSingleResult();
+            return em.find(User.class, username);
         } catch (NoResultException e) {
             throw new NotFoundException();
         }

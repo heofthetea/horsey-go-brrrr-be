@@ -15,7 +15,7 @@ public class Position {
     private String FEN;
 
     @Column
-    private Integer turn;
+    private Integer turnNumber;
 
     @JoinColumn
     @ManyToOne
@@ -37,15 +37,18 @@ public class Position {
         this.FEN = FEN;
     }
 
-    public Integer getTurn() {
-        return turn;
+    public Integer getTurnNumber() {
+        return turnNumber;
     }
-    public void setTurn(Integer turn) {
-        this.turn = turn;
+
+    public void setTurnNumber(Integer turnNumber) {
+        this.turnNumber = turnNumber;
     }
+
     public Game getGame() {
         return game;
     }
+
     public void setGame(Game game) {
         this.game = game;
     }
