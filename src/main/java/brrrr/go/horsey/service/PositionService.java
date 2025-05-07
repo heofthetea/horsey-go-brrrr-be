@@ -4,5 +4,5 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class PositionService {
-    public Position makeTurn()
+//    public Position makeTurn()
 }
