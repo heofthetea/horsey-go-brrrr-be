@@ -76,7 +76,7 @@ public class GameService {
         if (existingGame.addGuest(guest)){
             // If the game is updated to have a guest, we need to update the game state
             // to reflect that it is now in progress.
-            existingGame.setState(Game.GameState.IN_PROGRESS);
+            existingGame.setState(Game.State.IN_PROGRESS);
         }
         em.persist(existingGame);
         return existingGame;

@@ -1,5 +1,6 @@
 package brrrr.go.horsey.orm;
 
+import brrrr.go.horsey.service.JEN;
 import jakarta.persistence.*;
 
 import java.util.UUID;
@@ -12,7 +13,8 @@ public class Position {
 
     // Carried over from chess - some way to represent a connect-four board using a string
     @Column
-    private String FEN;
+    @Convert(converter = JENConverter.class)
+    private JEN jen;
 
     @Column
     private Integer turnNumber;
@@ -29,12 +31,12 @@ public class Position {
         this.id = id;
     }
 
-    public String getFEN() {
-        return FEN;
+    public JEN getJEN() {
+        return jen;
     }
 
-    public void setFEN(String FEN) {
-        this.FEN = FEN;
+    public void setFEN(JEN jen) {
+        this.jen = jen;
     }
 
     public Integer getTurnNumber() {

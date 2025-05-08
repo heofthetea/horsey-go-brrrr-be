@@ -36,7 +36,7 @@ public class Game {
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'NOT_STARTED'")
     // default here is handled also by the constructor, because leaving it up to the dbms with insertable = false pretty much nuked every bit of logical behaviour JPA had remaining
-    private GameState state;
+    private State state;
 
     @Column(name = "to_move", nullable = false, insertable = false)
     @ColumnDefault("'HOST'") // nah bro I won't make the mistake of enumerating this shit again
@@ -54,7 +54,7 @@ public class Game {
         this.host = host;
         this.width = width;
         this.height = height;
-        this.state = GameState.NOT_STARTED;
+        this.state = State.NOT_STARTED;
     }
 
     // default constructor is required by JPA
@@ -64,7 +64,7 @@ public class Game {
         this.width = 0;
         this.height = 0;
         this.startTime = new Timestamp(System.currentTimeMillis());
-        this.state = GameState.NOT_STARTED;
+        this.state = State.NOT_STARTED;
     }
 
     public UUID getId() {
@@ -137,29 +137,35 @@ public class Game {
         this.endTime = endTime;
     }
 
-    public GameState getState() {
+    public State getState() {
         return state;
     }
 
-    public void setState(GameState state) {
+    public void setState(State state) {
         this.state = state;
     }
 
     public void setState(String state) {
-        this.state = GameState.valueOf(state);
+        this.state = State.valueOf(state);
     }
 
-    public enum GameState {
+    public enum State {
         NOT_STARTED("NOT_STARTED"),
         IN_PROGRESS("IN_PROGRESS"),
-        PLAYER_1_WON("HOST_WON"),
-        PLAYER_2_WON("GUEST_WON"),
+        HOST_WON("HOST_WON"),
+        GUEST_WON("GUEST_WON"),
         DRAW("DRAW");
 
         final String value;
 
-        private GameState(String value) {
+        private State(String value) {
             this.value = value;
+        }
+
+        public static State fromPlayerChar(char player) {;
+            if (player == 'x') return HOST_WON;
+            if (player == 'o') return GUEST_WON;
+            return DRAW;
         }
     }
 
