@@ -17,6 +17,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class GameService {
@@ -34,7 +35,10 @@ public class GameService {
             Player player = userService.getUser(userId);
             return em.createQuery("SELECT g FROM Game g WHERE (host = :user  OR guest = :user)", Game.class)
                     .setParameter("user", player)
-                    .getResultList();
+                    .getResultList()
+                    .stream() // add transient value current position to each game
+                    .map(game -> game.setCurrentPosition(positionService.getLatestPosition(game).getJen()))
+                    .collect(Collectors.toList());
         } catch (NoResultException e) {
             throw new NotFoundException();
         }

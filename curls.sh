@@ -34,7 +34,7 @@ create_game() {
 
 
 get_games() {
-  curl --silent "$url/games?user_id=$1"
+  curl --silent "$url/games?username=$1"
 }
 
 get_game_by_id() {

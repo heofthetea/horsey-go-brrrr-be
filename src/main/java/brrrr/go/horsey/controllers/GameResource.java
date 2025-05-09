@@ -36,8 +36,8 @@ public class GameResource {
 
     @GET
     @Path("/")
-    public List<Game> getGames(@QueryParam("user_id") String userId) {
-        return gameService.getGamesByUser(userId);
+    public List<Game> getGames(@QueryParam("username") String username) {
+        return gameService.getGamesByUser(username);
     }
 
     @GET
