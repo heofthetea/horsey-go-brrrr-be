@@ -10,6 +10,7 @@ register_user(){
       \"password\": \"$2\",
       \"email\": \"$3\"
     }"
+  echo ""
 }
 
 get_user(){
@@ -17,6 +18,9 @@ get_user(){
 }
 
 
+# $1 = username - selects first game of the user
+# $2 = width - selects the width of the game
+# $3 = height - selects the height of the game
 create_game() {
   json="{\"host\": {\"username\": \"$1\"},
              \"width\": $2,
@@ -64,11 +68,30 @@ make_turn() {
   json="{\"user\": {\"username\": \"$2\"},
              \"column\": $3
            }"
-  curl --silent -vX PUT "$url/games/$1/make-turn" \
+  curl --silent -X PUT "$url/games/$1/make-turn" \
     -H "Content-Type: application/json" \
     -d "$json"
 }
 
 delete_game() {
   curl --silent -X DELETE "$url/games/$1"
+}
+
+test_game_ops() {
+
+  full_environment | tail -n 1 | jq -r .id > /tmp/game_id && read -r game_id < /tmp/game_id
+
+  declare -A player_map=([-1]='test1' [1]='test2')
+  player=-1
+  while [[ 'HOST_WON' != "$game_result" ]]; do
+    echo "Making turn for player: ${player_map[$player]}, $((player + 1))"
+    make_turn "$game_id" "${player_map[$player]}" $((player + 1)) | jq -r '.game.state' > /tmp/game_result
+    sleep 1
+    read -r game_result < /tmp/game_result
+    player=$((player * -1))
+  done
+  echo "Game result: $game_result"
+  get_latest_position "$game_id"
+
+  delete_game "$game_id"
 }

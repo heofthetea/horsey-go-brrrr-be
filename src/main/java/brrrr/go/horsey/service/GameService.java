@@ -12,7 +12,6 @@ import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.WebApplicationException;
-import net.bytebuddy.pool.TypePool;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;

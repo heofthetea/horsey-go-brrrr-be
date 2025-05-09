@@ -22,7 +22,7 @@ public class Position {
     @Column
     private Integer turnNumber;
 
-    @JoinColumn
+    @JoinColumn(name = "game_id")
     @ManyToOne(cascade = CascadeType.REMOVE)
     private Game game;
 

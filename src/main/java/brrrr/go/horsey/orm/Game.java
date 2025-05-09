@@ -1,9 +1,11 @@
 package brrrr.go.horsey.orm;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.sql.Timestamp;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -16,6 +18,7 @@ import java.util.UUID;
 public class Game {
 
     @Id
+    @Column(name = "game_id")
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
@@ -39,7 +42,7 @@ public class Game {
     private State state;
 
     @Column(name = "to_move", nullable = false, insertable = false)
-    @ColumnDefault("'HOST'") // nah bro I won't make the mistake of enumerating this shit again
+    @ColumnDefault("'HOST'") // nah bro I won't make the mistake of enumerating this BS again
     private String toMove;
 
     @ManyToOne
@@ -49,6 +52,11 @@ public class Game {
     @ManyToOne
     @JoinColumn(name = "guest")
     private User guest;
+
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "game", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<Position> positions;
 
     public Game(User host, Byte width, Byte height) {
         this.host = host;
