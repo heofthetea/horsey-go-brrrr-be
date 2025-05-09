@@ -1,8 +1,8 @@
 package brrrr.go.horsey.service;
 
 import brrrr.go.horsey.orm.Game;
+import brrrr.go.horsey.orm.Player;
 import brrrr.go.horsey.orm.Position;
-import brrrr.go.horsey.orm.User;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -31,9 +31,9 @@ public class GameService {
 
     public List<Game> getGamesByUser(String userId) throws NotFoundException {
         try {
-            User user = userService.getUser(userId);
+            Player player = userService.getUser(userId);
             return em.createQuery("SELECT g FROM Game g WHERE (host = :user  OR guest = :user)", Game.class)
-                    .setParameter("user", user)
+                    .setParameter("user", player)
                     .getResultList();
         } catch (NoResultException e) {
             throw new NotFoundException();
@@ -80,10 +80,10 @@ public class GameService {
      * @return the updated game
      */
     @Transactional
-    public Game addGuest(String gameId, User guest) {
+    public Game addGuest(String gameId, Player guest) {
         Game existingGame = em.find(Game.class, UUID.fromString(gameId));
-        User existingUser = em.find(User.class, guest.getUsername());
-        if (existingUser == null) {
+        Player existingPlayer = em.find(Player.class, guest.getUsername());
+        if (existingPlayer == null) {
             throw new BadRequestException("User not found");
         }
         if (existingGame == null) {
@@ -104,13 +104,13 @@ public class GameService {
      *
      * @param gameId the id of the game to make a turn in
      * @param turn   Integer representing the column the turn was made in
-     * @param user   the user making the turn
+     * @param player   the user making the turn
      * @return
      */
     @Transactional
-    public Position makeTurn(String gameId, Byte turn, User user) {
+    public Position makeTurn(String gameId, Byte turn, Player player) {
         Game game = em.find(Game.class, UUID.fromString(gameId));
-        user = em.find(User.class, user.getUsername()); //todo might be optional need to verify
+        player = em.find(Player.class, player.getUsername()); //todo might be optional need to verify
         if (game == null) {
             throw new NotFoundException("Game not found");
         }
@@ -123,7 +123,7 @@ public class GameService {
         // latest should never be null as default position gets created at creation
         JEN newJEN = latest.getJen().clone();
 
-        if (!isAllowedToMove(game, newJEN, user)) {
+        if (!isAllowedToMove(game, newJEN, player)) {
             throw new ForbiddenException("Not your turn donkey");
         }
 
@@ -153,13 +153,13 @@ public class GameService {
     }
 
 
-    private boolean isAllowedToMove(Game game, JEN jen, User user) {
+    private boolean isAllowedToMove(Game game, JEN jen, Player player) {
         char userSymbol = '-';
 
-        if (game.getHost().equals(user)) {
+        if (game.getHost().equals(player)) {
             userSymbol = 'x';
         }
-        if (game.getGuest().equals(user)) {
+        if (game.getGuest().equals(player)) {
             userSymbol = 'o';
         }
 

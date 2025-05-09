@@ -3,7 +3,7 @@ port=8080
 url=http://$host:$port/api
 
 register_user(){
-  curl --silent -X POST "$url/users/register" \
+  curl --silent -X POST "$url/players/register" \
     -H "Content-Type: application/json" \
     -d "{
       \"username\": \"$1\",
@@ -14,7 +14,7 @@ register_user(){
 }
 
 get_user(){
-  curl --silent "$url/users/$1"
+  curl --silent "$url/players/$1"
 }
 
 
@@ -83,15 +83,18 @@ test_game_ops() {
 
   declare -A player_map=([-1]='test1' [1]='test2')
   player=-1
+  unset game_result
   while [[ 'HOST_WON' != "$game_result" ]]; do
     echo "Making turn for player: ${player_map[$player]}, $((player + 1))"
     make_turn "$game_id" "${player_map[$player]}" $((player + 1)) | jq -r '.game.state' > /tmp/game_result
-    sleep 1
+
     read -r game_result < /tmp/game_result
     player=$((player * -1))
   done
   echo "Game result: $game_result"
   get_latest_position "$game_id"
 
-  delete_game "$game_id"
+  if [ "$1" == "--delete-after" ]; then
+    delete_game "$game_id"
+  fi
 }

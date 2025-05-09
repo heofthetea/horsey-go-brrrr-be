@@ -47,18 +47,18 @@ public class Game {
 
     @ManyToOne
     @JoinColumn(name = "host", nullable = false)
-    private User host;
+    private Player host;
 
     @ManyToOne
     @JoinColumn(name = "guest")
-    private User guest;
+    private Player guest;
 
 
     @JsonIgnore
     @OneToMany(mappedBy = "game", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Position> positions;
 
-    public Game(User host, Byte width, Byte height) {
+    public Game(Player host, Byte width, Byte height) {
         this.host = host;
         this.width = width;
         this.height = height;
@@ -91,19 +91,19 @@ public class Game {
         this.startTime = startTime;
     }
 
-    public User getHost() {
+    public Player getHost() {
         return host;
     }
 
-    public void setHost(User host) {
+    public void setHost(Player host) {
         this.host = host;
     }
 
-    public User getGuest() {
+    public Player getGuest() {
         return guest;
     }
 
-    public void setGuest(User guest) {
+    public void setGuest(Player guest) {
         this.guest = guest;
     }
 
@@ -112,7 +112,7 @@ public class Game {
      * @param guest the guest to add
      * @return true if the guest was added, false otherwise
      */
-    public boolean addGuest(User guest) {
+    public boolean addGuest(Player guest) {
         if (guest == null)
             return false;
         if (this.guest != null)

@@ -2,16 +2,14 @@ package brrrr.go.horsey.controllers;
 
 
 import brrrr.go.horsey.orm.Game;
+import brrrr.go.horsey.orm.Player;
 import brrrr.go.horsey.orm.Position;
-import brrrr.go.horsey.orm.User;
 import brrrr.go.horsey.rest.LoggingFilter;
 import brrrr.go.horsey.rest.TurnRequest;
 import brrrr.go.horsey.service.GameService;
 import brrrr.go.horsey.service.PositionService;
-import io.smallrye.common.annotation.Blocking;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
-import org.eclipse.microprofile.openapi.annotations.OpenAPIDefinition;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
@@ -61,7 +59,7 @@ public class GameResource {
             @APIResponse(responseCode = "200", description = "Guest successfully added"),
             @APIResponse(responseCode = "404", description = "Game not found")
     })
-    public Game updateGame(@PathParam("game_id") String gameId, @RequestBody User guest) {
+    public Game updateGame(@PathParam("game_id") String gameId, @RequestBody Player guest) {
         return gameService.addGuest(gameId, guest);
     }
 

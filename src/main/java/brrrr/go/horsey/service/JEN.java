@@ -255,7 +255,7 @@ public class JEN implements Cloneable{
      * Should be fine though considering all validation should happen somewhere else
      *
      * @param player
-     * @return
+     * @return 'x' if player is 'o', 'o' if player is 'x'
      */
     private char otherPlayer(char player) {
         if (player == 'x') {
