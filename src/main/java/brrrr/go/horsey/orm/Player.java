@@ -1,9 +1,12 @@
 package brrrr.go.horsey.orm;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+/**
+ * ORM Model for a user/player.
+ * The terminology is a bit mixed up sadly, all originating from the fact that it has to be called differently in the database.
+ * Is acceptable only because I'm the only one working on this and eh, it works
+ */
 @Entity
 @Table(name = "player") // cannot name a table 'user' in postgres
 public class Player {

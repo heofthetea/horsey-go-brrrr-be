@@ -3,7 +3,7 @@ port=8080
 url=http://$host:$port/api
 
 register_user(){
-  curl --silent -X POST "$url/players/register" \
+  curl --silent -X POST "$url/users/register" \
     -H "Content-Type: application/json" \
     -d "{
       \"username\": \"$1\",
@@ -14,7 +14,7 @@ register_user(){
 }
 
 get_user(){
-  curl --silent "$url/players/$1"
+  curl --silent "$url/users/$1"
 }
 
 
@@ -78,7 +78,6 @@ delete_game() {
 }
 
 test_game_ops() {
-
   full_environment | tail -n 1 | jq -r .id > /tmp/game_id && read -r game_id < /tmp/game_id
 
   declare -A player_map=([-1]='test1' [1]='test2')
