@@ -113,7 +113,7 @@ public class GameService {
      * @return
      */
     @Transactional
-    public Position makeTurn(String gameId, Byte turn, Player player) {
+    public Game makeTurn(String gameId, Byte turn, Player player) {
         Game game = em.find(Game.class, UUID.fromString(gameId));
         player = em.find(Player.class, player.getUsername()); //todo might be optional need to verify
         if (game == null) {
@@ -153,13 +153,18 @@ public class GameService {
                     .setState(newJEN.getState());
             em.persist(game);
         }
-        return newPosition;
+        return game.setCurrentPosition(newJEN);
 
     }
 
 
     private boolean isAllowedToMove(Game game, JEN jen, Player player) {
         char userSymbol = '-';
+
+        // dirty workaround to allow for a player to play against themselves. Would be a pain to code the frontend otherwise
+        if(game.getHost().equals(game.getGuest())) {
+            return true;
+        }
 
         if (game.getHost().equals(player)) {
             userSymbol = 'x';

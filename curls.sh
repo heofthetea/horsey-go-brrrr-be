@@ -57,6 +57,13 @@ full_environment() {
   join_game test2 "$game_id"
 }
 
+# join the player to their own game
+frontend_environment() {
+  register_user test1 test 'test1@test.de'
+  game_id=$(create_game test1 9 9 | jq -r '.id')
+  join_game test1 "$game_id"
+}
+
 get_game_history() {
   curl --silent "$url/games/$1/history"
 }

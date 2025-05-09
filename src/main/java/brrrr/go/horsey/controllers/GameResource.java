@@ -84,7 +84,7 @@ public class GameResource {
             @APIResponse(responseCode = "409", description = "Turn impossible (out of bounds or invalid)")
 
     })
-    public Position makeTurn(@PathParam("game_id") String gameId, TurnRequest turn) {
+    public Game makeTurn(@PathParam("game_id") String gameId, TurnRequest turn) {
         return gameService.makeTurn(gameId, turn.getColumn(),  turn.getUser());
     }
 
