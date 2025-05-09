@@ -40,9 +40,10 @@ public class GameService {
         }
     }
 
-    public Game getGame(String gameId) throws NotFoundException {
+    public Game getGameWithPosition(String gameId) throws NotFoundException {
         try {
-            return em.find(Game.class, UUID.fromString(gameId));
+            Game game = em.find(Game.class, UUID.fromString(gameId));
+            return game.setCurrentPosition(positionService.getLatestPosition(game).getJen());
         } catch (NoResultException e) {
             throw new NotFoundException();
         }
@@ -59,7 +60,7 @@ public class GameService {
                 .setTurnNumber(0)
                 .setJen(defaultJEN);
         em.persist(defaultPosition);
-        return game;
+        return game.setCurrentPosition(defaultJEN);
     }
 
     @Transactional

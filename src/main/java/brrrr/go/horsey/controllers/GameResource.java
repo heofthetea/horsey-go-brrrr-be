@@ -10,12 +10,18 @@ import brrrr.go.horsey.service.GameService;
 import brrrr.go.horsey.service.PositionService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.UriInfo;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.jboss.logging.Logger;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Path("/games")
 public class GameResource {
@@ -41,7 +47,7 @@ public class GameResource {
             @APIResponse(responseCode = "404", description = "Game not found")
     })
     public Game getGame(@PathParam("game_id") String gameId) {
-        return gameService.getGame(gameId);
+        return gameService.getGameWithPosition(gameId);
     }
 
     @POST
@@ -93,13 +99,13 @@ public class GameResource {
     }
 
     @GET
-    @Path("/{game_id}/latest-position")
+    @Path("/{game_id}/history")
     @APIResponses({
             @APIResponse(responseCode = "200", description = "Latest turn found"),
             @APIResponse(responseCode = "404", description = "Game not found")
     })
-    public Position getLatestTurn(@PathParam("game_id") String gameId) {
-        return positionService.getLatestPosition(gameService.getGame(gameId));
+    public List<Position> getGameHistory(@PathParam("game_id") String gameId) {
+        return positionService.getGameHistory(gameService.getGameWithPosition(gameId));
     }
 
 

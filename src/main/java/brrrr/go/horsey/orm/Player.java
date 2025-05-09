@@ -12,7 +12,7 @@ public class Player {
     @Column(name = "username")
     private String username;
 
-    @JsonIgnore
+//    @JsonIgnore //todo DO SOMETHING ABOUT AT LEAST A LITTLE BIT OF SECURITY HOLY DUCK
     @Column(nullable = false)
     private String password;
 
