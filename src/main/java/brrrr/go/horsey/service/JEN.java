@@ -7,7 +7,7 @@ import brrrr.go.horsey.orm.Game.State;
  * Exposes methods to manipulate, as well as get relevant Information about the JEN string.
  * Using functions for this probably is criminal in terms of performance, but keeps the code shorter so fine.
  */
-public class JEN {
+public class JEN implements Cloneable{
 
     String jen;
     boolean isValid;
@@ -15,8 +15,24 @@ public class JEN {
 
     public JEN(String jen) {
         this.jen = jen;
-        this.isValid = isValid(jen);
+        this.isValid = JEN.isValid(jen);
     }
+
+    /**
+     * Creates a default JEN for the start of a game.
+     * @param width width of the board
+     * @param height height of the board
+     */
+    public JEN(byte width, byte height) {
+        assert width > 0 && height > 0;
+        this.jen = String.format("%03d%03d", width, height) + "x" + "-".repeat(width * height);
+        this.isValid = true;
+    }
+
+    public JEN clone() {
+        return new JEN(this.jen);
+    }
+
 
     /**
      * Get the complete JEN string.
@@ -64,7 +80,12 @@ public class JEN {
         return this.isValid ? jen.substring(7) : null;
     }
 
-    public State getResult() {
+    /**
+     * Determine the state of the game based on the current board.
+     * #allhailthevibecoding
+     * @return {@link State} of the game, null if invalid
+     */
+    public State getState() {
         if (!this.isValid) {
             return null;
         }
@@ -120,7 +141,7 @@ public class JEN {
             return State.DRAW;
         }
 
-        // jen is valid, however nobody won and it's not a draw
+        // jen is valid, however nobody won, and it's not a draw
         return State.IN_PROGRESS;
 
     }
@@ -131,8 +152,8 @@ public class JEN {
      * Warning: Does not validate the board - assumes that both dimensions and player turns are valid.
      *
      * @param column the column to place the move in
-     * @return the new JEN string
      * @throws IllegalArgumentException if column is out of bounds or full
+     * @return the new JEN string
      */
     public void makeTurn(Byte column) {
         final byte width = getWidth();

@@ -7,6 +7,21 @@ import org.junit.jupiter.api.Test;
 public class JENTest {
 
     @Test
+    public void testDefaultJEN() {
+        JEN jen = new JEN((byte) 8, (byte) 8);
+        String expected = "008008x" + "-".repeat(8 * 8);
+        Assertions.assertEquals(expected, jen.toString(), "Default JEN should be 8x8 with no pieces");
+    }
+
+    @Test
+    public void testJENFromString() {
+        JEN jen = new JEN("004003o-xox--xo----");
+        String expected = "004003o-xox--xo----";
+        Assertions.assertEquals(expected, jen.toString(), "JEN from string should match input string");
+    }
+
+
+    @Test
     public void testMakeTurn() {
         JEN jen = new JEN("003003x---------");
         jen.makeTurn((byte) 0);
@@ -58,7 +73,7 @@ public class JENTest {
                     "ooo--" +
                     "-----" +
                     "-----";
-            Assertions.assertEquals(Game.State.HOST_WON, new JEN(horizontalWin).getResult(), "Horizontal win should be detected");
+            Assertions.assertEquals(Game.State.HOST_WON, new JEN(horizontalWin).getState(), "Horizontal win should be detected");
 
             // test with dead space
             String horizontalWinWithDeadSpace = "006004o" +
@@ -66,7 +81,7 @@ public class JENTest {
                     "-ooxoo" +
                     "-xxxxo" +
                     "------";
-            Assertions.assertEquals(Game.State.HOST_WON, new JEN(horizontalWinWithDeadSpace).getResult(), "Horizontal win with dead space ini the beginning should be detected");
+            Assertions.assertEquals(Game.State.HOST_WON, new JEN(horizontalWinWithDeadSpace).getState(), "Horizontal win with dead space ini the beginning should be detected");
         }
 
         @Test
@@ -77,7 +92,7 @@ public class JENTest {
                     "o---" +
                     "o---" +
                     "----";
-            Assertions.assertEquals(Game.State.GUEST_WON, new JEN(verticalWin).getResult(), "Vertical win should be detected");
+            Assertions.assertEquals(Game.State.GUEST_WON, new JEN(verticalWin).getState(), "Vertical win should be detected");
         }
 
         @Test
@@ -88,7 +103,7 @@ public class JENTest {
                     "--xo-" +
                     "---x-" +
                     "-----";
-            Assertions.assertEquals(Game.State.HOST_WON, new JEN(diagonalWinLR).getResult(), "Diagonal (\\) win should be detected");
+            Assertions.assertEquals(Game.State.HOST_WON, new JEN(diagonalWinLR).getState(), "Diagonal (\\) win should be detected");
         }
 
         @Test
@@ -99,7 +114,7 @@ public class JENTest {
                     "-xo--" +
                     "-o---" +
                     "-----";
-            Assertions.assertEquals(Game.State.GUEST_WON, new JEN(diagonalWinRL).getResult(), "Diagonal (/) win should be detected");
+            Assertions.assertEquals(Game.State.GUEST_WON, new JEN(diagonalWinRL).getState(), "Diagonal (/) win should be detected");
         }
 
         @Test
@@ -109,7 +124,7 @@ public class JENTest {
                     "ooox" +
                     "xxxo" +
                     "ooox";
-            Assertions.assertEquals(Game.State.DRAW, new JEN(draw).getResult(), "Full board with no winner should be a draw");
+            Assertions.assertEquals(Game.State.DRAW, new JEN(draw).getState(), "Full board with no winner should be a draw");
         }
 
         @Test
@@ -120,12 +135,12 @@ public class JENTest {
                     "oxox" +
                     "----" +
                     "----";
-            Assertions.assertEquals(Game.State.IN_PROGRESS, new JEN(inProgress).getResult(), "Incomplete board should be in progress");
+            Assertions.assertEquals(Game.State.IN_PROGRESS, new JEN(inProgress).getState(), "Incomplete board should be in progress");
         }
 
         @Test
         public void testInvalidJEN() {
             String invalid = "004003x-oxox-------"; // floating x
-            Assertions.assertNull(new JEN(invalid).getResult(), "Invalid JEN should return null");
+            Assertions.assertNull(new JEN(invalid).getState(), "Invalid JEN should return null");
         }
 }

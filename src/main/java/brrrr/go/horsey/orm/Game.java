@@ -117,36 +117,41 @@ public class Game {
         return width;
     }
 
-    public void setWidth(Byte width) {
+    public Game setWidth(Byte width) {
         this.width = width;
+        return this;
     }
 
     public Byte getHeight() {
         return height;
     }
 
-    public void setHeight(Byte height) {
+    public Game setHeight(Byte height) {
         this.height = height;
+        return this;
     }
 
     public Timestamp getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Timestamp endTime) {
+    public Game setEndTime(Timestamp endTime) {
         this.endTime = endTime;
+        return this;
     }
 
     public State getState() {
         return state;
     }
 
-    public void setState(State state) {
+    public Game setState(State state) {
         this.state = state;
+        return this;
     }
 
-    public void setState(String state) {
+    public Game setState(String state) {
         this.state = State.valueOf(state);
+        return this;
     }
 
     public enum State {
