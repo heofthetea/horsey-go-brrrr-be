@@ -53,7 +53,7 @@ join_game(){
 full_environment() {
   register_user test1 test 'test1@test.de'
   register_user test2 test 'test2@test.de'
-  game_id=$(create_game test1 6 6 | jq -r '.id')
+  game_id=$(create_game test1 9 9 | jq -r '.id')
   join_game test2 "$game_id"
 }
 
