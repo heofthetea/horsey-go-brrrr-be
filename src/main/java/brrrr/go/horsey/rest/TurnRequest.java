@@ -7,20 +7,16 @@ import brrrr.go.horsey.orm.User;
  *
  */
 public class TurnRequest {
-    private Short column;
+    private Byte column;
     private User user;
 
     public TurnRequest() {
     }
-    public TurnRequest(Short column, User user) {
-        this.column = column;
-        this.user = user;
-    }
 
-    public Short getColumn() {
+    public Byte getColumn() {
         return column;
     }
-    public void setColumn(Short column) {
+    public void setColumn(Byte column) {
         this.column = column;
     }
     public User getUser() {

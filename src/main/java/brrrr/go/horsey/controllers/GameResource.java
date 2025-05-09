@@ -2,10 +2,13 @@ package brrrr.go.horsey.controllers;
 
 
 import brrrr.go.horsey.orm.Game;
+import brrrr.go.horsey.orm.Position;
 import brrrr.go.horsey.orm.User;
 import brrrr.go.horsey.rest.LoggingFilter;
 import brrrr.go.horsey.rest.TurnRequest;
 import brrrr.go.horsey.service.GameService;
+import brrrr.go.horsey.service.PositionService;
+import io.smallrye.common.annotation.Blocking;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import org.eclipse.microprofile.openapi.annotations.OpenAPIDefinition;
@@ -21,6 +24,9 @@ public class GameResource {
 
     @Inject
     GameService gameService;
+
+    @Inject
+    PositionService positionService;
 
     private static final Logger LOG = Logger.getLogger(LoggingFilter.class);
 
@@ -70,10 +76,12 @@ public class GameResource {
     @APIResponses({
             @APIResponse(responseCode = "200", description = "Turn made successfully"),
             @APIResponse(responseCode = "404", description = "Game not found"),
-            @APIResponse(responseCode = "403", description = "Not your turn donkey")
+            @APIResponse(responseCode = "403", description = "Not your turn donkey"),
+            @APIResponse(responseCode = "409", description = "Turn impossible (out of bounds or invalid)")
+
     })
-    public Game makeTurn(@PathParam("game_id") String gameId, TurnRequest turn) {
-        return gameService.makeTurn(gameId, turn.getColumn(), turn.getUser());
+    public Position makeTurn(@PathParam("game_id") String gameId, TurnRequest turn) {
+        return gameService.makeTurn(gameId, turn.getColumn(),  turn.getUser());
     }
 
     @DELETE
@@ -84,6 +92,16 @@ public class GameResource {
     })
     public void deleteGame(@PathParam("game_id") String gameId) {
         gameService.deleteGame(gameId);
+    }
+
+    @GET
+    @Path("/{game_id}/latest-position")
+    @APIResponses({
+            @APIResponse(responseCode = "200", description = "Latest turn found"),
+            @APIResponse(responseCode = "404", description = "Game not found")
+    })
+    public Position getLatestTurn(@PathParam("game_id") String gameId) {
+        return positionService.getLatestPosition(gameService.getGame(gameId));
     }
 
 

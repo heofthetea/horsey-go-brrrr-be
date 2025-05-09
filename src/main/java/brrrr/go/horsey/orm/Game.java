@@ -1,9 +1,11 @@
 package brrrr.go.horsey.orm;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.sql.Timestamp;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -16,6 +18,7 @@ import java.util.UUID;
 public class Game {
 
     @Id
+    @Column(name = "game_id")
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
@@ -36,10 +39,10 @@ public class Game {
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'NOT_STARTED'")
     // default here is handled also by the constructor, because leaving it up to the dbms with insertable = false pretty much nuked every bit of logical behaviour JPA had remaining
-    private GameState state;
+    private State state;
 
     @Column(name = "to_move", nullable = false, insertable = false)
-    @ColumnDefault("'HOST'") // nah bro I won't make the mistake of enumerating this shit again
+    @ColumnDefault("'HOST'") // nah bro I won't make the mistake of enumerating this BS again
     private String toMove;
 
     @ManyToOne
@@ -50,11 +53,16 @@ public class Game {
     @JoinColumn(name = "guest")
     private User guest;
 
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "game", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<Position> positions;
+
     public Game(User host, Byte width, Byte height) {
         this.host = host;
         this.width = width;
         this.height = height;
-        this.state = GameState.NOT_STARTED;
+        this.state = State.NOT_STARTED;
     }
 
     // default constructor is required by JPA
@@ -64,7 +72,7 @@ public class Game {
         this.width = 0;
         this.height = 0;
         this.startTime = new Timestamp(System.currentTimeMillis());
-        this.state = GameState.NOT_STARTED;
+        this.state = State.NOT_STARTED;
     }
 
     public UUID getId() {
@@ -117,49 +125,60 @@ public class Game {
         return width;
     }
 
-    public void setWidth(Byte width) {
+    public Game setWidth(Byte width) {
         this.width = width;
+        return this;
     }
 
     public Byte getHeight() {
         return height;
     }
 
-    public void setHeight(Byte height) {
+    public Game setHeight(Byte height) {
         this.height = height;
+        return this;
     }
 
     public Timestamp getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Timestamp endTime) {
+    public Game setEndTime(Timestamp endTime) {
         this.endTime = endTime;
+        return this;
     }
 
-    public GameState getState() {
+    public State getState() {
         return state;
     }
 
-    public void setState(GameState state) {
+    public Game setState(State state) {
         this.state = state;
+        return this;
     }
 
-    public void setState(String state) {
-        this.state = GameState.valueOf(state);
+    public Game setState(String state) {
+        this.state = State.valueOf(state);
+        return this;
     }
 
-    public enum GameState {
+    public enum State {
         NOT_STARTED("NOT_STARTED"),
         IN_PROGRESS("IN_PROGRESS"),
-        PLAYER_1_WON("HOST_WON"),
-        PLAYER_2_WON("GUEST_WON"),
+        HOST_WON("HOST_WON"),
+        GUEST_WON("GUEST_WON"),
         DRAW("DRAW");
 
         final String value;
 
-        private GameState(String value) {
+        private State(String value) {
             this.value = value;
+        }
+
+        public static State fromPlayerChar(char player) {;
+            if (player == 'x') return HOST_WON;
+            if (player == 'o') return GUEST_WON;
+            return DRAW;
         }
     }
 

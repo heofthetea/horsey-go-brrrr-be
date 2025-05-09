@@ -1,5 +1,8 @@
 package brrrr.go.horsey.orm;
 
+import brrrr.go.horsey.rest.JENSerializer;
+import brrrr.go.horsey.service.JEN;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 
 import java.util.UUID;
@@ -12,44 +15,50 @@ public class Position {
 
     // Carried over from chess - some way to represent a connect-four board using a string
     @Column
-    private String FEN;
+    @Convert(converter = JENConverter.class)
+    @JsonSerialize(using = JENSerializer.class)
+    private JEN jen;
 
     @Column
     private Integer turnNumber;
 
-    @JoinColumn
-    @ManyToOne
+    @JoinColumn(name = "game_id")
+    @ManyToOne(cascade = CascadeType.REMOVE)
     private Game game;
 
     public UUID getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public Position setId(UUID id) {
         this.id = id;
+        return this;
     }
 
-    public String getFEN() {
-        return FEN;
+    public JEN getJen() {
+        return jen;
     }
 
-    public void setFEN(String FEN) {
-        this.FEN = FEN;
+    public Position setJen(JEN jen) {
+        this.jen = jen;
+        return this;
     }
 
     public Integer getTurnNumber() {
         return turnNumber;
     }
 
-    public void setTurnNumber(Integer turnNumber) {
+    public Position setTurnNumber(Integer turnNumber) {
         this.turnNumber = turnNumber;
+        return this;
     }
 
     public Game getGame() {
         return game;
     }
 
-    public void setGame(Game game) {
+    public Position setGame(Game game) {
         this.game = game;
+        return this;
     }
 }
