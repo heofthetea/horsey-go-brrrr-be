@@ -7,7 +7,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.ResponseStatus;
 
-@Path("/players")
+@Path("/users")
 public class UserResource {
     @Inject
     UserService userService;

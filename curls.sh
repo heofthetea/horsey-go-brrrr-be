@@ -3,7 +3,7 @@ port=8080
 url=http://$host:$port/api
 
 register_user(){
-  curl --silent -X POST "$url/players/register" \
+  curl --silent -X POST "$url/users/register" \
     -H "Content-Type: application/json" \
     -d "{
       \"username\": \"$1\",
@@ -14,7 +14,7 @@ register_user(){
 }
 
 get_user(){
-  curl --silent "$url/players/$1"
+  curl --silent "$url/users/$1"
 }
 
 
@@ -53,12 +53,12 @@ join_game(){
 full_environment() {
   register_user test1 test 'test1@test.de'
   register_user test2 test 'test2@test.de'
-  game_id=$(create_game test1 5 5 | jq -r '.id')
+  game_id=$(create_game test1 6 6 | jq -r '.id')
   join_game test2 "$game_id"
 }
 
-get_latest_position() {
-  curl --silent "$url/games/$1/latest-position"
+get_game_history() {
+  curl --silent "$url/games/$1/history"
 }
 
 # $1 = game_id
@@ -78,7 +78,6 @@ delete_game() {
 }
 
 test_game_ops() {
-
   full_environment | tail -n 1 | jq -r .id > /tmp/game_id && read -r game_id < /tmp/game_id
 
   declare -A player_map=([-1]='test1' [1]='test2')
@@ -92,7 +91,7 @@ test_game_ops() {
     player=$((player * -1))
   done
   echo "Game result: $game_result"
-  get_latest_position "$game_id"
+  echo "Game history:" && get_game_history "$game_id" | jq -r '.[].jen'
 
   if [ "$1" == "--delete-after" ]; then
     delete_game "$game_id"

@@ -1,7 +1,11 @@
 package brrrr.go.horsey.orm;
 
+import brrrr.go.horsey.rest.JENSerializer;
+import brrrr.go.horsey.service.JEN;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
+import jakarta.transaction.TransactionScoped;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.sql.Timestamp;
@@ -41,10 +45,6 @@ public class Game {
     // default here is handled also by the constructor, because leaving it up to the dbms with insertable = false pretty much nuked every bit of logical behaviour JPA had remaining
     private State state;
 
-    @Column(name = "to_move", nullable = false, insertable = false)
-    @ColumnDefault("'HOST'") // nah bro I won't make the mistake of enumerating this BS again
-    private String toMove;
-
     @ManyToOne
     @JoinColumn(name = "host", nullable = false)
     private Player host;
@@ -57,6 +57,14 @@ public class Game {
     @JsonIgnore
     @OneToMany(mappedBy = "game", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Position> positions;
+
+    /**
+     * Field is only used to serialize a game in communication with the frontend.
+     * Saves at least one request to fetch the latest position to a game.
+     */
+    @Transient
+    @JsonSerialize(using = JENSerializer.class)
+    private JEN currentPosition;
 
     public Game(Player host, Byte width, Byte height) {
         this.host = host;
@@ -121,6 +129,24 @@ public class Game {
         return true;
     }
 
+    public Set<Position> getPositions() {
+        return positions;
+    }
+
+    public void setPositions(Set<Position> positions) {
+        this.positions = positions;
+    }
+
+    public JEN getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public Game setCurrentPosition(JEN currentPosition) {
+        this.currentPosition = currentPosition;
+        return this;
+    }
+
+
     public Byte getWidth() {
         return width;
     }
@@ -161,6 +187,8 @@ public class Game {
         this.state = State.valueOf(state);
         return this;
     }
+
+
 
     public enum State {
         NOT_STARTED("NOT_STARTED"),
