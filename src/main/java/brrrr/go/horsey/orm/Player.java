@@ -4,11 +4,9 @@ package brrrr.go.horsey.orm;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-import java.util.UUID;
-
 @Entity
 @Table(name = "player") // cannot name a table 'user' in postgres
-public class User {
+public class Player {
 
     @Id
     @Column(name = "username")
@@ -21,14 +19,14 @@ public class User {
     @Column(nullable = false)
     private String email;
 
-    public User(String username, String password, String email) {
+    public Player(String username, String password, String email) {
         this.username = username;
         this.password = password;
         this.email = email;
     }
 
     // default constructor is required by JPA somehow
-    public User() {
+    public Player() {
         this.username = "";
         this.password = "";
         this.email = "";

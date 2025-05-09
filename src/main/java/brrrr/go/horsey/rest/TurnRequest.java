@@ -1,6 +1,6 @@
 package brrrr.go.horsey.rest;
 
-import brrrr.go.horsey.orm.User;
+import brrrr.go.horsey.orm.Player;
 
 /**
  * Helper Class to receive the request to make a turn in a singular JSON object.
@@ -8,7 +8,7 @@ import brrrr.go.horsey.orm.User;
  */
 public class TurnRequest {
     private Byte column;
-    private User user;
+    private Player player;
 
     public TurnRequest() {
     }
@@ -19,10 +19,10 @@ public class TurnRequest {
     public void setColumn(Byte column) {
         this.column = column;
     }
-    public User getUser() {
-        return user;
+    public Player getUser() {
+        return player;
     }
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser(Player player) {
+        this.player = player;
     }
 }
