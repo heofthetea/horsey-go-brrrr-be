@@ -45,7 +45,7 @@ get_game_by_id() {
 # $2 = username - selects the user to join
 join_game(){
   json="{\"username\": \"$1\"}"
-  curl --silent -X PUT "$url/games/join/$2" \
+  curl --silent -X PUT "$url/games/$2/join" \
     -H "Content-Type: application/json" \
     -d "$json"
 }

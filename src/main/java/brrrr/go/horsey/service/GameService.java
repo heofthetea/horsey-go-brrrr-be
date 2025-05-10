@@ -33,7 +33,7 @@ public class GameService {
     public List<Game> getGamesByUser(String userId) throws NotFoundException {
         try {
             Player player = userService.getUser(userId);
-            return em.createQuery("SELECT g FROM Game g WHERE (host = :user  OR guest = :user)", Game.class)
+            return em.createQuery("SELECT g FROM Game g WHERE (host = :user  OR guest = :user) ORDER BY (end_time, start_time) desc", Game.class)
                     .setParameter("user", player)
                     .getResultList()
                     .stream() // add transient value current position to each game
@@ -100,7 +100,7 @@ public class GameService {
             existingGame.setState(Game.State.IN_PROGRESS);
         }
         em.persist(existingGame);
-        return existingGame;
+        return existingGame.setCurrentPosition(positionService.getLatestPosition(existingGame).getJen());
     }
 
     /**

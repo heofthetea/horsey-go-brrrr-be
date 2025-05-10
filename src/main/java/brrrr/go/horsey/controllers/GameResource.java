@@ -10,18 +10,12 @@ import brrrr.go.horsey.service.GameService;
 import brrrr.go.horsey.service.PositionService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.core.UriInfo;
-import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.jboss.logging.Logger;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Path("/games")
 public class GameResource {
@@ -34,6 +28,11 @@ public class GameResource {
 
     private static final Logger LOG = Logger.getLogger(LoggingFilter.class);
 
+    /**
+     * Returns a list of games for a given user.
+     * Games are sorted primarily by end time, secondarily by start time; descending.
+     * This means that all unfinished games come first, then all finished games.
+     */
     @GET
     @Path("/")
     public List<Game> getGames(@QueryParam("username") String username) {
@@ -60,12 +59,12 @@ public class GameResource {
      * Joins a User to a game.
      */
     @PUT
-    @Path("/join/{game_id}")
+    @Path("/{game_id}/join")
     @APIResponses({
             @APIResponse(responseCode = "200", description = "Guest successfully added"),
             @APIResponse(responseCode = "404", description = "Game not found")
     })
-    public Game updateGame(@PathParam("game_id") String gameId, @RequestBody Player guest) {
+    public Game joinGame(@PathParam("game_id") String gameId, @RequestBody Player guest) {
         return gameService.addGuest(gameId, guest);
     }
 
@@ -73,7 +72,7 @@ public class GameResource {
      * Makes a turn in the game.
      * @param gameId the id of the game to make a turn in
      * @param turn Integer representing the column the turn was made in
-     * @return
+     * @return the updated game
      */
     @PUT
     @Path("/{game_id}/make-turn")
