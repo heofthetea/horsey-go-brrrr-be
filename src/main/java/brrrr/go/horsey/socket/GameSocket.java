@@ -16,9 +16,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 @ServerEndpoint("/ws/game/{gameId}")
 @ApplicationScoped
-public class GameWebSocket {
+public class GameSocket {
 
-    Logger LOG = Logger.getLogger(GameWebSocket.class);
+    Logger LOG = Logger.getLogger(GameSocket.class);
 
     private static final Map<UUID, Set<Session>> subscriptions = new ConcurrentHashMap<>();
 
@@ -62,11 +62,17 @@ public class GameWebSocket {
         LOG.debug("Received from client: " + message);
     }
 
-    public static void broadcastGameUpdate(UUID gameId, String json) {
+
+    public static void broadcastGameUpdate(UUID gameId, String json) { // I'm not bothering figuring out how to cleanly send an object clearly it doesn't want me to
+
         Set<Session> sessions = subscriptions.getOrDefault(gameId, Set.of());
         for (Session session : sessions) {
             if (session.isOpen()) {
-                session.getAsyncRemote().sendText(json);
+                session.getAsyncRemote().sendText(json, result -> {
+                    if (result.getException() != null) {
+                        Logger.getLogger(GameSocket.class).info("Error sending message to session " + session.getId() + ": " + result.getException().getMessage());
+                    }
+                });
             }
         }
     }

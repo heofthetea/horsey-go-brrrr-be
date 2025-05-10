@@ -3,6 +3,9 @@ package brrrr.go.horsey.service;
 import brrrr.go.horsey.orm.Game;
 import brrrr.go.horsey.orm.Player;
 import brrrr.go.horsey.orm.Position;
+import brrrr.go.horsey.socket.GameSocket;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -16,6 +19,7 @@ import jakarta.ws.rs.WebApplicationException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -33,7 +37,7 @@ public class GameService {
     public List<Game> getGamesByUser(String userId) throws NotFoundException {
         try {
             Player player = userService.getUser(userId);
-            return em.createQuery("SELECT g FROM Game g WHERE (host = :user  OR guest = :user) ORDER BY (end_time, start_time) desc", Game.class)
+            return em.createQuery("SELECT g FROM Game g WHERE (host = :user  OR guest = :user) ORDER BY (endTime, startTime) desc", Game.class)
                     .setParameter("user", player)
                     .getResultList()
                     .stream() // add transient value current position to each game
@@ -139,11 +143,10 @@ public class GameService {
         }
         Position newPosition = new Position()
                 .setJen(newJEN)
-                .setGame(game)
+                .setGame(game.setCurrentPosition(newJEN)) // stateful programming is funny
                 .setTurnNumber(latest.getTurnNumber() + 1);
 
         em.persist(newPosition);
-        //TODO: send websocket message to clients
 
 
         // Check if the game is over
@@ -153,8 +156,24 @@ public class GameService {
                     .setState(newJEN.getState());
             em.persist(game);
         }
-        return game.setCurrentPosition(newJEN);
 
+        try {
+            GameSocket.broadcastGameUpdate(game.getId(), serializeTurn(turn, player, game));
+        } catch (JsonProcessingException e) {
+            // idk what the fuck can i do
+        }
+        return game;
+
+    }
+
+    private String serializeTurn(Byte turn, Player player, Game game) throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+        return om.writeValueAsString(Map.of(
+                "type", "GAME_UPDATED",
+                "turnIn", turn,
+                "turnBy", player.getUsername(),
+                "game", game
+        ));
     }
 
 

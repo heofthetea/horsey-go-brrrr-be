@@ -92,7 +92,7 @@ test_game_ops() {
   unset game_result
   while [[ 'HOST_WON' != "$game_result" ]]; do
     echo "Making turn for player: ${player_map[$player]}, $((player + 1))"
-    make_turn "$game_id" "${player_map[$player]}" $((player + 1)) | jq -r '.game.state' > /tmp/game_result
+    make_turn "$game_id" "${player_map[$player]}" $((player + 1)) | jq -r '.state' > /tmp/game_result
 
     read -r game_result < /tmp/game_result
     player=$((player * -1))
