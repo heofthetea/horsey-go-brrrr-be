@@ -14,8 +14,7 @@ quarkus:
     username: postgres
     password: postgres
     jdbc:
-      url: jdbc:postgresql://localhost:5432/horsey_go_brrrr?createDatabaseIfNotExist=true
-
+      url: jdbc:postgresql://localhost:5432/horsey_api
   hibernate-orm:
     database:
       generation: drop-and-create
@@ -24,4 +23,4 @@ quarkus:
   quarkus:
     datasource:
       jdbc:
-        url: jdbc:postgresql://postgres:5432/horsey_go_brrrr
+        url: jdbc:postgresql://horsey-postgres:5432/horsey_api
