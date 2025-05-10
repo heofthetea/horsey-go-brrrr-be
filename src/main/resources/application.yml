@@ -1,10 +1,12 @@
-
 quarkus:
   devservices:
     enabled: false
   http:
     port: 8080
     root-path: /api
+    cors:
+      enabled: true
+      origins: /.*/
 
   datasource:
     db-kind: postgresql

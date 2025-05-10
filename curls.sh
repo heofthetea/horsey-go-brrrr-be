@@ -3,7 +3,7 @@ port=8080
 url=http://$host:$port/api
 
 register_user(){
-  curl --silent -X POST "$url/players/register" \
+  curl --silent -X POST "$url/users/register" \
     -H "Content-Type: application/json" \
     -d "{
       \"username\": \"$1\",
@@ -14,7 +14,7 @@ register_user(){
 }
 
 get_user(){
-  curl --silent "$url/players/$1"
+  curl --silent "$url/users/$1"
 }
 
 
@@ -34,7 +34,7 @@ create_game() {
 
 
 get_games() {
-  curl --silent "$url/games?user_id=$1"
+  curl --silent "$url/games?username=$1"
 }
 
 get_game_by_id() {
@@ -45,7 +45,7 @@ get_game_by_id() {
 # $2 = username - selects the user to join
 join_game(){
   json="{\"username\": \"$1\"}"
-  curl --silent -X PUT "$url/games/join/$2" \
+  curl --silent -X PUT "$url/games/$2/join" \
     -H "Content-Type: application/json" \
     -d "$json"
 }
@@ -53,12 +53,19 @@ join_game(){
 full_environment() {
   register_user test1 test 'test1@test.de'
   register_user test2 test 'test2@test.de'
-  game_id=$(create_game test1 5 5 | jq -r '.id')
+  game_id=$(create_game test1 9 9 | jq -r '.id')
   join_game test2 "$game_id"
 }
 
-get_latest_position() {
-  curl --silent "$url/games/$1/latest-position"
+# join the player to their own game
+frontend_environment() {
+  register_user test1 test 'test1@test.de'
+  game_id=$(create_game test1 9 9 | jq -r '.id')
+  join_game test1 "$game_id"
+}
+
+get_game_history() {
+  curl --silent "$url/games/$1/history"
 }
 
 # $1 = game_id
@@ -78,7 +85,6 @@ delete_game() {
 }
 
 test_game_ops() {
-
   full_environment | tail -n 1 | jq -r .id > /tmp/game_id && read -r game_id < /tmp/game_id
 
   declare -A player_map=([-1]='test1' [1]='test2')
@@ -86,13 +92,13 @@ test_game_ops() {
   unset game_result
   while [[ 'HOST_WON' != "$game_result" ]]; do
     echo "Making turn for player: ${player_map[$player]}, $((player + 1))"
-    make_turn "$game_id" "${player_map[$player]}" $((player + 1)) | jq -r '.game.state' > /tmp/game_result
+    make_turn "$game_id" "${player_map[$player]}" $((player + 1)) | jq -r '.state' > /tmp/game_result
 
     read -r game_result < /tmp/game_result
     player=$((player * -1))
   done
   echo "Game result: $game_result"
-  get_latest_position "$game_id"
+  echo "Game history:" && get_game_history "$game_id" | jq -r '.[].jen'
 
   if [ "$1" == "--delete-after" ]; then
     delete_game "$game_id"

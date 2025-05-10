@@ -28,10 +28,15 @@ public class GameResource {
 
     private static final Logger LOG = Logger.getLogger(LoggingFilter.class);
 
+    /**
+     * Returns a list of games for a given user.
+     * Games are sorted primarily by end time, secondarily by start time; descending.
+     * This means that all unfinished games come first, then all finished games.
+     */
     @GET
     @Path("/")
-    public List<Game> getGames(@QueryParam("user_id") String userId) {
-        return gameService.getGamesByUser(userId);
+    public List<Game> getGames(@QueryParam("username") String username) {
+        return gameService.getGamesByUser(username);
     }
 
     @GET
@@ -41,7 +46,7 @@ public class GameResource {
             @APIResponse(responseCode = "404", description = "Game not found")
     })
     public Game getGame(@PathParam("game_id") String gameId) {
-        return gameService.getGame(gameId);
+        return gameService.getGameWithPosition(gameId);
     }
 
     @POST
@@ -54,12 +59,12 @@ public class GameResource {
      * Joins a User to a game.
      */
     @PUT
-    @Path("/join/{game_id}")
+    @Path("/{game_id}/join")
     @APIResponses({
             @APIResponse(responseCode = "200", description = "Guest successfully added"),
             @APIResponse(responseCode = "404", description = "Game not found")
     })
-    public Game updateGame(@PathParam("game_id") String gameId, @RequestBody Player guest) {
+    public Game joinGame(@PathParam("game_id") String gameId, @RequestBody Player guest) {
         return gameService.addGuest(gameId, guest);
     }
 
@@ -67,7 +72,7 @@ public class GameResource {
      * Makes a turn in the game.
      * @param gameId the id of the game to make a turn in
      * @param turn Integer representing the column the turn was made in
-     * @return
+     * @return the updated game
      */
     @PUT
     @Path("/{game_id}/make-turn")
@@ -78,7 +83,7 @@ public class GameResource {
             @APIResponse(responseCode = "409", description = "Turn impossible (out of bounds or invalid)")
 
     })
-    public Position makeTurn(@PathParam("game_id") String gameId, TurnRequest turn) {
+    public Game makeTurn(@PathParam("game_id") String gameId, TurnRequest turn) {
         return gameService.makeTurn(gameId, turn.getColumn(),  turn.getUser());
     }
 
@@ -93,13 +98,13 @@ public class GameResource {
     }
 
     @GET
-    @Path("/{game_id}/latest-position")
+    @Path("/{game_id}/history")
     @APIResponses({
             @APIResponse(responseCode = "200", description = "Latest turn found"),
             @APIResponse(responseCode = "404", description = "Game not found")
     })
-    public Position getLatestTurn(@PathParam("game_id") String gameId) {
-        return positionService.getLatestPosition(gameService.getGame(gameId));
+    public List<Position> getGameHistory(@PathParam("game_id") String gameId) {
+        return positionService.getGameHistory(gameService.getGameWithPosition(gameId));
     }
 
 
