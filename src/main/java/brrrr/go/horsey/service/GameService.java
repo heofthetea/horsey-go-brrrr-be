@@ -23,6 +23,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static brrrr.go.horsey.socket.SocketSerialization.serializeJoin;
+import static brrrr.go.horsey.socket.SocketSerialization.serializeTurn;
+
 @ApplicationScoped
 public class GameService {
     @Inject
@@ -104,6 +107,12 @@ public class GameService {
             existingGame.setState(Game.State.IN_PROGRESS);
         }
         em.persist(existingGame);
+
+        try {
+            // this is getting out of hand I should have simply used a getter for the latest position thing
+            GameSocket.broadcastGameUpdate(existingGame.getId(), serializeJoin(guest, existingGame.setCurrentPosition(positionService.getLatestPosition(existingGame).getJen())));
+        } catch (JsonProcessingException e) {
+        }
         return existingGame.setCurrentPosition(positionService.getLatestPosition(existingGame).getJen());
     }
 
@@ -113,7 +122,7 @@ public class GameService {
      *
      * @param gameId the id of the game to make a turn in
      * @param turn   Integer representing the column the turn was made in
-     * @param player   the user making the turn
+     * @param player the user making the turn
      * @return
      */
     @Transactional
@@ -160,20 +169,11 @@ public class GameService {
         try {
             GameSocket.broadcastGameUpdate(game.getId(), serializeTurn(turn, player, game));
         } catch (JsonProcessingException e) {
-            // idk what the fuck can i do
+            // idk what the fuck can i do if that happens it really shouldn't tho because everything is checked like 20 times but you never know
+            // either way it's fine client should just reload the page
         }
         return game;
 
-    }
-
-    private String serializeTurn(Byte turn, Player player, Game game) throws JsonProcessingException {
-        ObjectMapper om = new ObjectMapper();
-        return om.writeValueAsString(Map.of(
-                "type", "GAME_UPDATED",
-                "turnIn", turn,
-                "turnBy", player.getUsername(),
-                "game", game
-        ));
     }
 
 
@@ -181,7 +181,7 @@ public class GameService {
         char userSymbol = '-';
 
         // dirty workaround to allow for a player to play against themselves. Would be a pain to code the frontend otherwise
-        if(game.getHost().equals(game.getGuest())) {
+        if (game.getHost().equals(game.getGuest())) {
             return true;
         }
 
