@@ -1,6 +1,6 @@
 quarkus:
   devservices:
-    enabled: false
+    enabled: false # i'm perfectly able to start my own docker containers thank you
   http:
     port: 8080
     root-path: /api
@@ -18,6 +18,17 @@ quarkus:
   hibernate-orm:
     database:
       generation: drop-and-create
+  oidc:
+    client-id: horsey-api
+    auth-server-url: http://localhost:8081/realms/horsey-realm
+    credentials:
+      secret: 5P1jLzJpd3mmCBj466BVno257pO3xuk9
+    tls:
+      verification: none # ✨ security ✨
+  keycloak:
+    policy-enforcer:
+      enable: true
+
 
 "%prod":
   quarkus:

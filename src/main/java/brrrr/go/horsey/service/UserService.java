@@ -28,4 +28,21 @@ public class UserService {
         }
     }
 
+    /**
+     * Get or create a user.
+     * Used to map users stored in keycloak to internal users in the database.
+     * @param username
+     * @return
+     */
+    public Player getOrCreate(String username) {
+        try {
+            return em.find(Player.class, username);
+        } catch (NoResultException e) {
+            Player player = new Player();
+            player.setUsername(username);
+            em.persist(player);
+            return player;
+        }
+    }
+
 }

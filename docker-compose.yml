@@ -22,7 +22,9 @@ services:
     # restart: unless-stopped
     ports:
       - "8081:8080"
-    command: ["start-dev"]
+    command: ["start-dev", "--import-realm", "-Dkeycloak.profile.feature.upload_scripts=enabled"]
+    volumes:
+        - ./src/main/docker/keycloak/:/opt/keycloak/data/import/
     environment:
       - KC_BOOTSTRAP_ADMIN_USERNAME=admin
       - KC_BOOTSTRAP_ADMIN_PASSWORD=admin

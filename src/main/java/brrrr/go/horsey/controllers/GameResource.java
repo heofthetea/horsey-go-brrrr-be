@@ -8,6 +8,7 @@ import brrrr.go.horsey.rest.LoggingFilter;
 import brrrr.go.horsey.rest.TurnRequest;
 import brrrr.go.horsey.service.GameService;
 import brrrr.go.horsey.service.PositionService;
+import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
@@ -18,6 +19,7 @@ import org.jboss.logging.Logger;
 import java.util.List;
 
 @Path("/games")
+@Authenticated
 public class GameResource {
 
     @Inject
