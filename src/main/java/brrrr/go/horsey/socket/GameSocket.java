@@ -7,6 +7,7 @@ import io.quarkus.oidc.UserInfo;
 import io.quarkus.security.Authenticated;
 import jakarta.annotation.security.PermitAll;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.control.ActivateRequestContext;
 import jakarta.inject.Inject;
 import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
@@ -37,6 +38,7 @@ public class GameSocket {
     private static final Map<UUID, Set<Session>> subscriptions = new ConcurrentHashMap<>();
 
     @OnOpen
+    @ActivateRequestContext
     public void onOpen(Session session, @PathParam("gameId") String gameIdStr) {
         try {
             UUID gameId = UUID.fromString(gameIdStr);
