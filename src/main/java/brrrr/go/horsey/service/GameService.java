@@ -101,6 +101,9 @@ public class GameService {
         if (existingGame == null) {
             throw new NotFoundException("Game not found");
         }
+        if(existingGame.getGuest() != null) {
+            throw new ForbiddenException("Game already has a guest");
+        }
         if (existingGame.addGuest(guest)) {
             // If the game is updated to have a guest, we need to update the game state
             // to reflect that it is now in progress.
@@ -169,11 +172,17 @@ public class GameService {
         try {
             GameSocket.broadcastGameUpdate(game.getId(), serializeTurn(turn, player, game));
         } catch (JsonProcessingException e) {
-            // idk what the fuck can i do if that happens it really shouldn't tho because everything is checked like 20 times but you never know
+            // idk what can i do if that happens it really shouldn't tho because everything is checked like 20 times but you never know
             // either way it's fine client should just reload the page
         }
         return game;
 
+    }
+
+    public boolean isPlayerInGame(String username, String gameId) {
+        Player player = em.find(Player.class, username);
+        Game game = em.find(Game.class, UUID.fromString(gameId));
+        return game != null && (player.equals(game.getHost()) || player.equals(game.getGuest()));
     }
 
 

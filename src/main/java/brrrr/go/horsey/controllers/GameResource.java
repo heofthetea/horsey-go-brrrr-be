@@ -58,6 +58,9 @@ public class GameResource {
     })
     //TODO potential access control, fine for now
     public Game getGame(@PathParam("game_id") String gameId) {
+        if(!gameService.isPlayerInGame(identity.getPrincipal().getName(), gameId)) {
+            throw new ForbiddenException("You are not a player in this game");
+        }
         return gameService.getGameWithPosition(gameId);
     }
 

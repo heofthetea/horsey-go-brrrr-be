@@ -1,10 +1,17 @@
 package brrrr.go.horsey.socket;
 
 
+import brrrr.go.horsey.service.GameService;
+import brrrr.go.horsey.service.UserService;
+import io.quarkus.oidc.UserInfo;
+import io.quarkus.security.Authenticated;
+import jakarta.annotation.security.PermitAll;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
+import jakarta.ws.rs.ForbiddenException;
 import org.jboss.logging.Logger;
 
 
@@ -14,11 +21,18 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-@ServerEndpoint("/ws/game/{gameId}")
+@ServerEndpoint(value = "/ws/game/{gameId}", configurator = WebSocketSecurityConfigurator.class)
 @ApplicationScoped
+@Authenticated
 public class GameSocket {
 
     Logger LOG = Logger.getLogger(GameSocket.class);
+    @Inject
+    UserInfo userInfo;
+
+    @Inject
+    GameService gameService;
+
 
     private static final Map<UUID, Set<Session>> subscriptions = new ConcurrentHashMap<>();
 
@@ -26,11 +40,20 @@ public class GameSocket {
     public void onOpen(Session session, @PathParam("gameId") String gameIdStr) {
         try {
             UUID gameId = UUID.fromString(gameIdStr);
+            if(!gameService.isPlayerInGame(userInfo.getPreferredUserName(), gameIdStr)) {
+                throw new ForbiddenException("You are not a player in this game");
+            }
             subscriptions.computeIfAbsent(gameId, k -> new CopyOnWriteArraySet<>()).add(session);
             LOG.debug("Session " + session.getId() + " subscribed to game " + gameId);
         } catch (IllegalArgumentException e) {
             try {
                 session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, "Invalid gameId: " + gameIdStr));
+            } catch (Exception ex) {
+                LOG.error(ex.getMessage());
+            }
+        } catch (ForbiddenException e) {
+            try {
+                session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, "You are not a player in this game"));
             } catch (Exception ex) {
                 LOG.error(ex.getMessage());
             }
