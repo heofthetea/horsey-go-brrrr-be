@@ -22,19 +22,20 @@ get_user(){
 # $2 = width - selects the width of the game
 # $3 = height - selects the height of the game
 create_game() {
-  json="{\"host\": {\"username\": \"$1\"},
-             \"width\": $2,
-             \"height\": $3,
+  json="{ \"host\": {\"username\": \"lirili larila\"},
+             \"width\": $1,
+             \"height\": $2,
              \"state\": \"NOT_STARTED\"
            }"
-  curl --silent -X POST "$url/games/create" \
+  curl --silent -vX POST "$url/games/create" \
     -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $3" \
     -d "$json"
 }
 
 
 get_games() {
-  curl --silent "$url/games?username=$1"
+  curl --silent "$url/games" -H "Authorization: Bearer $1"
 }
 
 get_game_by_id() {
@@ -44,9 +45,10 @@ get_game_by_id() {
 # $1 = username - selects first game of the user
 # $2 = username - selects the user to join
 join_game(){
-  json="{\"username\": \"$1\"}"
+  json="I'm a teapot"
   curl --silent -X PUT "$url/games/$2/join" \
     -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $3" \
     -d "$json"
 }
 
@@ -103,4 +105,26 @@ test_game_ops() {
   if [ "$1" == "--delete-after" ]; then
     delete_game "$game_id"
   fi
+}
+
+
+
+# -------------------------------------------------------------------------------------------------
+# oidc stuff
+kchost=http://localhost:8081
+realm=horsey-realm
+client_id=horsey-api
+secret=5P1jLzJpd3mmCBj466BVno257pO3xuk9
+uname=test1
+password='test'
+
+obtain_access_token() {
+  curl --silent -X POST "$kchost/realms/$realm/protocol/openid-connect/token" \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data-urlencode 'grant_type=password' \
+  --data-urlencode "client_id=$client_id" \
+  --data-urlencode "client_secret=$secret" \
+  --data-urlencode "username=$uname" \
+  --data-urlencode "password=$password" | jq -r '.access_token' | tee /tmp/access_token
+  read -r access_token < /tmp/access_token
 }

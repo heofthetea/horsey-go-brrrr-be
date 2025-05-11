@@ -8,6 +8,9 @@ import brrrr.go.horsey.rest.LoggingFilter;
 import brrrr.go.horsey.rest.TurnRequest;
 import brrrr.go.horsey.service.GameService;
 import brrrr.go.horsey.service.PositionService;
+import brrrr.go.horsey.service.UserService;
+import io.quarkus.security.Authenticated;
+import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
@@ -18,6 +21,7 @@ import org.jboss.logging.Logger;
 import java.util.List;
 
 @Path("/games")
+@Authenticated
 public class GameResource {
 
     @Inject
@@ -25,6 +29,12 @@ public class GameResource {
 
     @Inject
     PositionService positionService;
+
+    @Inject
+    UserService userService;
+
+    @Inject
+    SecurityIdentity identity;
 
     private static final Logger LOG = Logger.getLogger(LoggingFilter.class);
 
@@ -35,7 +45,8 @@ public class GameResource {
      */
     @GET
     @Path("/")
-    public List<Game> getGames(@QueryParam("username") String username) {
+    public List<Game> getGames() {
+        String username = identity.getPrincipal().getName();
         return gameService.getGamesByUser(username);
     }
 
@@ -45,13 +56,20 @@ public class GameResource {
             @APIResponse(responseCode = "200", description = "Game found"),
             @APIResponse(responseCode = "404", description = "Game not found")
     })
+    //TODO potential access control, fine for now
     public Game getGame(@PathParam("game_id") String gameId) {
+        if(!gameService.isPlayerInGame(identity.getPrincipal().getName(), gameId)) {
+            throw new ForbiddenException("You are not a player in this game");
+        }
         return gameService.getGameWithPosition(gameId);
     }
 
     @POST
     @Path("/create")
     public Game createGame(Game game) {
+        // Set the host to the current user
+        Player current = userService.getOrCreate(identity.getPrincipal().getName());
+        game.setHost(current);
         return gameService.createGame(game);
     }
 
@@ -64,7 +82,8 @@ public class GameResource {
             @APIResponse(responseCode = "200", description = "Guest successfully added"),
             @APIResponse(responseCode = "404", description = "Game not found")
     })
-    public Game joinGame(@PathParam("game_id") String gameId, @RequestBody Player guest) {
+    public Game joinGame(@PathParam("game_id") String gameId) {
+        Player guest = userService.getOrCreate(identity.getPrincipal().getName());
         return gameService.addGuest(gameId, guest);
     }
 

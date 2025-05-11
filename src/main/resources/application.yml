@@ -1,12 +1,14 @@
 quarkus:
   devservices:
-    enabled: false
+    enabled: false # i'm perfectly able to start my own docker containers thank you
   http:
     port: 8080
     root-path: /api
     cors:
       enabled: true
       origins: /.*/
+  websocket:
+    dispatch-to-worker: true
 
   datasource:
     db-kind: postgresql
@@ -14,14 +16,25 @@ quarkus:
     username: postgres
     password: postgres
     jdbc:
-      url: jdbc:postgresql://localhost:5432/horsey_go_brrrr?createDatabaseIfNotExist=true
-
+      url: jdbc:postgresql://localhost:5432/horsey_api
   hibernate-orm:
     database:
       generation: drop-and-create
+  oidc:
+    client-id: horsey-api
+    auth-server-url: http://localhost:8081/realms/horsey-realm
+    credentials:
+      secret: 5P1jLzJpd3mmCBj466BVno257pO3xuk9
+    tls:
+      verification: none # ✨ security ✨
+  keycloak:
+    policy-enforcer:
+      enable: true
+
+
 
 "%prod":
   quarkus:
     datasource:
       jdbc:
-        url: jdbc:postgresql://postgres:5432/horsey_go_brrrr
+        url: jdbc:postgresql://horsey-postgres:5432/horsey_api
