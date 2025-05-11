@@ -34,15 +34,16 @@ public class UserService {
      * @param username
      * @return
      */
+    @Transactional
     public Player getOrCreate(String username) {
-        try {
+        if(em.find(Player.class, username) != null) {
             return em.find(Player.class, username);
-        } catch (NoResultException e) {
-            Player player = new Player();
-            player.setUsername(username);
-            em.persist(player);
-            return player;
         }
+        Player player = new Player();
+        player.setUsername(username);
+        em.persist(player);
+        return player;
+
     }
 
 }

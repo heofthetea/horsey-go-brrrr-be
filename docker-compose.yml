@@ -28,10 +28,13 @@ services:
     environment:
       - KC_BOOTSTRAP_ADMIN_USERNAME=admin
       - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
-      - KC_DB=postgres
+      - KC_PROXY_ADDRESS_FORWARDING=true
+      - KC_HTTP_ENABLED=false
+      - KC_HOSTNAME_STRICT=false
       - KC_DB_URL=jdbc:postgresql://horsey-postgres:5432/horsey_keycloak
       - KC_DB_USERNAME=postgres
       - KC_DB_PASSWORD=postgres
+      - KC_DB=postgres
     networks:
         - horsey-net
 
