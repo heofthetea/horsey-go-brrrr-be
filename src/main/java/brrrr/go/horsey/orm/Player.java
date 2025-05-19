@@ -16,6 +16,7 @@ public class Player {
     @Column(name = "username")
     private String username;
 
+
     public Player(String username) {
         this.username = username;
     }
