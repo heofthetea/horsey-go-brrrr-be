@@ -5,7 +5,6 @@ import brrrr.go.horsey.orm.Player;
 import brrrr.go.horsey.orm.Position;
 import brrrr.go.horsey.socket.GameSocket;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -19,7 +18,6 @@ import jakarta.ws.rs.WebApplicationException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -161,16 +159,18 @@ public class GameService {
         em.persist(newPosition);
 
 
+        boolean gameOver = false;
         // Check if the game is over
         if (newJEN.getState() != Game.State.IN_PROGRESS) {
             game.setState(newJEN.getState())
                     .setEndTime(Timestamp.valueOf(LocalDateTime.now()))
                     .setState(newJEN.getState());
             em.persist(game);
+            gameOver = true;
         }
 
         try {
-            GameSocket.broadcastGameUpdate(game.getId(), serializeTurn(turn, player, game));
+            GameSocket.broadcastGameUpdate(game.getId(), serializeTurn(turn, player, game, gameOver));
         } catch (JsonProcessingException e) {
             // idk what can i do if that happens it really shouldn't tho because everything is checked like 20 times but you never know
             // either way it's fine client should just reload the page
