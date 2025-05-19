@@ -5,7 +5,7 @@ sequenceDiagram
 	participant Client B
 	end
 
-	box yellow horsey-go-brrrr-be
+	box purple horsey-go-brrrr-be
 	participant API
 	participant DB
 	participant WS
@@ -15,9 +15,9 @@ sequenceDiagram
 	Client A ->> API: makeTurn
 	API -->> DB: persist game
 	DB -->> API: ACK
-	API ->> Client A: 200 OK
-	API ->> WS: emit "GAME_UPDATED" + new game state
+	API -->> WS: emit "GAME_UPDATED" + new game state
 	WS ->> Client A: GAME_UPDATED
 	WS ->> Client B: GAME_UPDATED
+	API ->> Client A: 200 OK
 
 ```

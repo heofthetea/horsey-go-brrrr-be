@@ -38,3 +38,8 @@ quarkus:
     datasource:
       jdbc:
         url: jdbc:postgresql://horsey-postgres:5432/horsey_api
+    hibernate-orm:
+      database:
+        generation: update
+    oidc:
+      auth-server-url: http://horsey-keycloak:8080/realms/horsey-realm

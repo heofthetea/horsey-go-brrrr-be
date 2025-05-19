@@ -24,11 +24,20 @@ docker compose up -d
 ./mvnw quarkus:dev
 ```
 
+## Build
+```bash
+./mvnw clean package  -DskipTests
+docker build -f src/main/docker/Dockerfile.jvm -t heofthetea/horsey-go-brrrr-be:jvm-latest .
+```
+
 ## Resources
 
 ### JEN doc
 
 [jen.md](doc/jen.md)
+
+### Game flow 
+[sequence diagram mermaid](doc/websocket_sequence_diagram.md)
 
 ### Swagger UI
 
