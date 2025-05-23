@@ -14,10 +14,10 @@ import java.util.Map;
  */
 @ApplicationScoped
 public class SocketSerialization {
-    public static String serializeTurn(Byte turn, Player player, Game game) throws JsonProcessingException {
+    public static String serializeTurn(Byte turn, Player player, Game game, boolean gameOver) throws JsonProcessingException {
         ObjectMapper om = new ObjectMapper();
         return om.writeValueAsString(Map.of(
-                "type", "GAME_UPDATED",
+                "type", gameOver ? "GAME_OVER" : "GAME_UPDATED",
                 "turnIn", turn,
                 "turnBy", player.getUsername(),
                 "game", game
