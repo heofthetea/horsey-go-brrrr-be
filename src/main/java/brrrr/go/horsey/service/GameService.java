@@ -59,10 +59,22 @@ public class GameService {
     }
 
 
+    /**
+     * Create a game.
+     * Ensures the following criteria:
+     * - Automatically sets Game state to NOT_STARTED, regardless of what went in
+     * - Validates that the game dimensions are larger than 4x4. Upper limit is enforced by the database due to string length limit
+     * @param game The game from the post request
+     * @return the created game
+     */
     @Transactional
     public Game createGame(Game game) {
         // setState prevents bug where a game can be created with finished state
-        em.persist(game.setState(Game.State.NOT_STARTED));
+        game.setState(Game.State.NOT_STARTED);
+        if(game.getWidth() < 4 || game.getHeight() < 4) {
+            throw new BadRequestException("Board too small");
+        }
+        em.persist(game);
         // Create the default position for the game
         final JEN defaultJEN = new JEN(game.getWidth(), game.getHeight());
         Position defaultPosition = new Position()
@@ -83,8 +95,8 @@ public class GameService {
     }
 
     /**
-     * Suitably updates the given game.
-     * Can update the game state and add a guest. May do more in the future.
+     * Suitably updates the given game when a guest joins.
+     * Can update the game state and add a guest.
      *
      * @param gameId the id of the game to join the user to
      * @param guest  the user to add to the game
@@ -104,15 +116,16 @@ public class GameService {
             throw new ForbiddenException("Game already has a guest");
         }
         if (existingGame.addGuest(guest)) {
-            // If the game is updated to have a guest, we need to update the game state
-            // to reflect that it is now in progress.
             existingGame.setState(Game.State.IN_PROGRESS);
         }
         em.persist(existingGame);
 
         try {
             // this is getting out of hand I should have simply used a getter for the latest position thing
-            GameSocket.broadcastGameUpdate(existingGame.getId(), serializeJoin(guest, existingGame.setCurrentPosition(positionService.getLatestPosition(existingGame).getJen())));
+            GameSocket.broadcastGameUpdate(existingGame.getId(), serializeJoin(
+                    guest,
+                    existingGame.setCurrentPosition(positionService.getLatestPosition(existingGame).getJen())
+            ));
         } catch (JsonProcessingException e) {
         }
         return existingGame.setCurrentPosition(positionService.getLatestPosition(existingGame).getJen());
@@ -173,8 +186,7 @@ public class GameService {
         try {
             GameSocket.broadcastGameUpdate(game.getId(), serializeTurn(turn, player, game, gameOver));
         } catch (JsonProcessingException e) {
-            // idk what can i do if that happens it really shouldn't tho because everything is checked like 20 times but you never know
-            // either way it's fine client should just reload the page
+            // if anything fails here it's out of my control, the try-catch is jsut there to appease the compiler
         }
         return game;
 

@@ -7,6 +7,9 @@ import com.fasterxml.jackson.core.JsonGenerator;
 
 import java.io.IOException;
 
+/**
+ * JSON serializer for a {@link JEN} object.
+ */
 public class JENSerializer extends StdSerializer<JEN> {
     public JENSerializer() {
         this(null);

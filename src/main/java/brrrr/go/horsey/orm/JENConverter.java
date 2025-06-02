@@ -3,6 +3,10 @@ package brrrr.go.horsey.orm;
 import brrrr.go.horsey.service.JEN;
 import jakarta.persistence.AttributeConverter;
 
+/**
+ * Custom Converter to map a {@link JEN} object to a strin in the database,
+ * and vice versa.
+ */
 public class JENConverter implements AttributeConverter<JEN, String> {
 
     @Override

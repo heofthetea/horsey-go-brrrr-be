@@ -56,7 +56,6 @@ public class GameResource {
             @APIResponse(responseCode = "200", description = "Game found"),
             @APIResponse(responseCode = "404", description = "Game not found")
     })
-    //TODO potential access control, fine for now
     public Game getGame(@PathParam("game_id") String gameId) {
         if(!gameService.isPlayerInGame(identity.getPrincipal().getName(), gameId)) {
             throw new ForbiddenException("You are not a player in this game");
@@ -67,7 +66,6 @@ public class GameResource {
     @POST
     @Path("/create")
     public Game createGame(Game game) {
-        // Set the host to the current user
         Player current = userService.getOrCreate(identity.getPrincipal().getName());
         game.setHost(current);
         return gameService.createGame(game);
@@ -90,7 +88,7 @@ public class GameResource {
     /**
      * Makes a turn in the game.
      * @param gameId the id of the game to make a turn in
-     * @param turn Integer representing the column the turn was made in
+     * @param column Integer representing the column the turn was made in
      * @return the updated game
      */
     @PUT
@@ -102,8 +100,8 @@ public class GameResource {
             @APIResponse(responseCode = "409", description = "Turn impossible (out of bounds or invalid)")
 
     })
-    public Game makeTurn(@PathParam("game_id") String gameId, TurnRequest turn) {
-        return gameService.makeTurn(gameId, turn.getColumn(),  userService.getOrCreate(identity.getPrincipal().getName()));
+    public Game makeTurn(@PathParam("game_id") String gameId, Byte column) {
+        return gameService.makeTurn(gameId, column,  userService.getOrCreate(identity.getPrincipal().getName()));
     }
 
     @DELETE
