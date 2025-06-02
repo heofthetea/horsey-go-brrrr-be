@@ -9,6 +9,10 @@ import io.quarkus.security.identity.SecurityIdentity;
 
 import java.io.IOException;
 
+/**
+ * Adds a step to the workflow of received HTTP responses.
+ * Used to map users from a token to a user in the database.
+ */
 @Provider
 @Priority(2000)
 public class UserIdentityFilter implements ContainerRequestFilter {
@@ -29,8 +33,5 @@ public class UserIdentityFilter implements ContainerRequestFilter {
         String username = identity.getPrincipal().getName();
 
         userService.getOrCreate(username);
-
-//        // Optional: store current user in request context
-        requestContext.setProperty("currentUsername", username);
     }
 }

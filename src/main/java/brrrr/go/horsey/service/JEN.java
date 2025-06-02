@@ -254,7 +254,7 @@ public class JEN implements Cloneable{
      * Warning: anything other than 'x' will turn into 'o'
      * Should be fine though considering all validation should happen somewhere else
      *
-     * @param player
+     * @param player The player character to flip
      * @return 'x' if player is 'o', 'o' if player is 'x'
      */
     private char otherPlayer(char player) {

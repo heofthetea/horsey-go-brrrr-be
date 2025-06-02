@@ -13,8 +13,9 @@ public class Position {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    // Carried over from chess - some way to represent a connect-four board using a string
-    @Column
+
+    // allows for games up to 22x22 in size (22 * 22 + 7 = 491 < 512)
+    @Column(length = 512)
     @Convert(converter = JENConverter.class)
     @JsonSerialize(using = JENSerializer.class)
     private JEN jen;

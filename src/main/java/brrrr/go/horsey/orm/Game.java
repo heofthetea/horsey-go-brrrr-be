@@ -5,7 +5,6 @@ import brrrr.go.horsey.service.JEN;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
-import jakarta.transaction.TransactionScoped;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.sql.Timestamp;
