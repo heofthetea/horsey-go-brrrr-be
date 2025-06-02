@@ -12,7 +12,6 @@ import io.quarkus.security.Authenticated;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
-import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.jboss.logging.Logger;
@@ -120,6 +119,9 @@ public class GameResource {
             @APIResponse(responseCode = "404", description = "Game not found")
     })
     public List<Position> getGameHistory(@PathParam("game_id") String gameId) {
+        if(!gameService.isPlayerInGame(identity.getPrincipal().getName(), gameId)) {
+            throw new ForbiddenException("You are not a player in this game");
+        }
         return positionService.getGameHistory(gameService.getGameWithPosition(gameId));
     }
 
