@@ -5,7 +5,6 @@ import brrrr.go.horsey.orm.Game;
 import brrrr.go.horsey.orm.Player;
 import brrrr.go.horsey.orm.Position;
 import brrrr.go.horsey.rest.LoggingFilter;
-import brrrr.go.horsey.rest.TurnRequest;
 import brrrr.go.horsey.service.GameService;
 import brrrr.go.horsey.service.PositionService;
 import brrrr.go.horsey.service.UserService;
