@@ -61,7 +61,8 @@ public class GameService {
 
     @Transactional
     public Game createGame(Game game) {
-        em.persist(game);
+        // setState prevents bug where a game can be created with finished state
+        em.persist(game.setState(Game.State.NOT_STARTED));
         // Create the default position for the game
         final JEN defaultJEN = new JEN(game.getWidth(), game.getHeight());
         Position defaultPosition = new Position()
@@ -129,7 +130,7 @@ public class GameService {
     @Transactional
     public Game makeTurn(String gameId, Byte turn, Player player) {
         Game game = em.find(Game.class, UUID.fromString(gameId));
-        player = em.find(Player.class, player.getUsername()); //todo might be optional need to verify
+        player = em.find(Player.class, player.getUsername());
         if (game == null) {
             throw new NotFoundException("Game not found");
         }
@@ -201,10 +202,7 @@ public class GameService {
             userSymbol = 'o';
         }
 
-        if (userSymbol == '-') {
-            throw new ForbiddenException("Not your game donkey");
-        }
-        return jen.getCurrentPlayer() == userSymbol;
+        return jen.getCurrentPlayer() == userSymbol ;
 
     }
 

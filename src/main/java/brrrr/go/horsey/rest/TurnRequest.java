@@ -8,7 +8,6 @@ import brrrr.go.horsey.orm.Player;
  */
 public class TurnRequest {
     private Byte column;
-    private Player player;
 
     public TurnRequest() {
     }
@@ -18,11 +17,5 @@ public class TurnRequest {
     }
     public void setColumn(Byte column) {
         this.column = column;
-    }
-    public Player getUser() {
-        return player;
-    }
-    public void setUser(Player player) {
-        this.player = player;
     }
 }

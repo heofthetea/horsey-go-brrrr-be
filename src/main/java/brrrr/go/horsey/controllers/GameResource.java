@@ -103,7 +103,7 @@ public class GameResource {
 
     })
     public Game makeTurn(@PathParam("game_id") String gameId, TurnRequest turn) {
-        return gameService.makeTurn(gameId, turn.getColumn(),  turn.getUser());
+        return gameService.makeTurn(gameId, turn.getColumn(),  userService.getOrCreate(identity.getPrincipal().getName()));
     }
 
     @DELETE
