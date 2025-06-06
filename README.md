@@ -58,7 +58,7 @@ The project ships with a swagger UI. This is accessible under
 ![](doc/erm.png)
 
 
-## Code overview
+## Repository tour
 All source Code is located in `src/main`.<br>
 There are some unit tests for operations on JEN strings under `src/test/java`<br>
 The configuration happens in `application.yml`, located in `src/main/resources`.
