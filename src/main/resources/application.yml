@@ -2,13 +2,15 @@ quarkus:
   devservices:
     enabled: false # i'm perfectly able to start my own docker containers thank you
   http:
-    port: 8080
+    port: 8085
     root-path: /api
     cors:
       enabled: true
       origins: /.*/
   websocket:
     dispatch-to-worker: true
+  jackson:
+    write-dates-as-timestamps: true
 
   datasource:
     db-kind: postgresql
@@ -30,7 +32,12 @@ quarkus:
   keycloak:
     policy-enforcer:
       enable: true
-
+  log:
+    category:
+      "io.quarkus.oidc":
+        level: DEBUG
+      "io.vertx.ext.auth":
+        level: DEBUG
 
 
 "%prod":

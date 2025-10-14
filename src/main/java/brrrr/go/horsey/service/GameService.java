@@ -112,6 +112,11 @@ public class GameService {
         if (existingGame == null) {
             throw new NotFoundException("Game not found");
         }
+        // idempotency if player already is in game
+        if (existingGame.getGuest() == existingPlayer || existingGame.getHost() == existingPlayer) {
+            // how the fuck did I get a 1.0 for THIS CRAP
+            return existingGame.setCurrentPosition(positionService.getLatestPosition(existingGame).getJen());
+        }
         if(existingGame.getGuest() != null) {
             throw new ForbiddenException("Game already has a guest");
         }
