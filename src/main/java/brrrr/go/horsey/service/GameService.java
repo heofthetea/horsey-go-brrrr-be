@@ -4,7 +4,6 @@ import brrrr.go.horsey.orm.Game;
 import brrrr.go.horsey.orm.Player;
 import brrrr.go.horsey.orm.Position;
 import brrrr.go.horsey.socket.GameSocket;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -21,6 +20,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import static brrrr.go.horsey.socket.SocketSerialization.serializeJoin;
 import static brrrr.go.horsey.socket.SocketSerialization.serializeTurn;
 
@@ -34,6 +35,9 @@ public class GameService {
 
     @Inject
     PositionService positionService;
+
+    @Inject
+    HorseyRedisClient redisClient;
 
     public List<Game> getGamesByUser(String userId) throws NotFoundException {
         try {
@@ -172,6 +176,8 @@ public class GameService {
 
         em.persist(newPosition);
 
+        // Update cache
+        redisClient.appendPositionToHistoryCache(game, newPosition);
 
         boolean gameOver = false;
         // Check if the game is over

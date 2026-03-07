@@ -2,7 +2,7 @@ quarkus:
   devservices:
     enabled: false # i'm perfectly able to start my own docker containers thank you
   http:
-    port: 8080
+    port: 8085
     root-path: /api
     cors:
       enabled: true
@@ -30,8 +30,9 @@ quarkus:
   keycloak:
     policy-enforcer:
       enable: true
-
-
+horsey:
+  redis:
+    address: redis://localhost:6379
 
 "%prod":
   quarkus:
@@ -43,3 +44,6 @@ quarkus:
         generation: update
     oidc:
       auth-server-url: http://horsey-keycloak:8080/realms/horsey-realm
+  horsey:
+    redis:
+      address: redis://redis-demo:6379

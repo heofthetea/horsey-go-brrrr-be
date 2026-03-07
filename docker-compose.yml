@@ -45,3 +45,4 @@ volumes:
 
 networks:
   horsey-net:
+    name: horsey-net
