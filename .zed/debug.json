@@ -1,0 +1,10 @@
+[
+  {
+    "adapter": "Java",
+    "request": "attach",
+    "label": "Attach to Quarkus",
+    "hostName": "localhost",
+    "port": 5005,
+    "cwd": "$ZED_WORKTREE_ROOT/horsey-go-brrrr-be"
+  }
+]

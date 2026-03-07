@@ -1,0 +1,19 @@
+services:
+  redis-demo:
+    image: redis:latest
+    container_name: redis-demo
+    ports:
+      - 6379:6379
+    networks:
+      - horsey-net
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: redis-insight
+    ports:
+      - 5540:5540
+    networks:
+      - horsey-net
+
+networks:
+  horsey-net:
+    external: true
